@@ -1,20 +1,3 @@
-/**
- * Dynamic Header Component with Enhanced Search Bar
- * 
- * This script dynamically injects a custom header with a large search bar
- * into any website by replacing existing headers. It uses Shadow DOM to
- * ensure style isolation and prevent conflicts with existing site styles.
- * 
- * Usage:
- * 1. Add placeholder: <div id="kray-header"></div>
- * 2. Include script: <script src="[CDN_URL]/client_header.js"></script>
- * 
- * The script will:
- * - Hide existing site headers
- * - Inject custom header into #kray-header placeholder
- * - Use Shadow DOM for style isolation
- */
-
 (function() {
     'use strict';
 
@@ -91,18 +74,18 @@
                 }
 
                 /* Logo section */
-                .kray-logo {
+                .client-site-logo {
                     flex-shrink: 0;
                     display: flex;
                     align-items: center;
                 }
 
-                .kray-logo img {
+                .client-site-logo img {
                     height: 67px;
                     width: auto;
                 }
 
-                .kray-logo-text {
+                .client-site-logo-text {
                     font-size: 26px;
                     font-weight: 700;
                     color: #222;
@@ -111,17 +94,18 @@
 
                 /* Category dropdown */
                 .kray-category {
-                    flex-shrink: 0;
-                    margin-left: 12px;
+                    flex-shrink: 1;
+                    margin-left: 36px;
                     position: relative;
+                    min-width: 0;
                 }
 
                 .kray-category-select {
                     height: 56px;
                     padding: 0 40px 0 20px;
-                    border: 1px solid #003E4A;
-                    box-shadow: 0 2px 8px 0 rgba(128, 195, 67, 0.18);
-                    border-radius: 3px 0 0 3px;
+                    border: 1.5px solid #003E4A;
+                    box-shadow: -4px 0 8px -2px #e6f4dd, 0 4px 8px -2px #e6f4dd, 0 -4px 8px -2px #e6f4dd;
+                    border-radius: 3px;
                     font-size: 18px;
                     color: #374151;
                     background: #ffffff;
@@ -132,8 +116,9 @@
                     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
                     background-repeat: no-repeat;
                     background-position: right 16px center;
-                    min-width: 340px;
-                    margin-right: 16px;
+                    width: 100%;
+                    max-width: 340px;
+                    min-width: 90px;
                     margin-right: 0;
                     position: relative;
                     z-index: 2;
@@ -151,22 +136,25 @@
                 /* Search bar section */
                 .kray-search-wrapper {
                     flex: 4;
-                    max-width: 1600px;
+                    max-width: 100%;
                     display: flex;
+                    flex-direction: row;
+                    position: relative;
                 }
 
                 .kray-search-input {
                     width: 100%;
                     height: 56px;
-                    padding: 0 48px;
-                    border: 1px solid #003E4A;
-                    box-shadow: 0 2px 8px 0 rgba(128, 195, 67, 0.18);
+                    padding: 0 60px 0 20px;
+                    border: 1.5px solid #003E4A;
+                    box-shadow: 4px 0 8px -2px #e6f4dd, 0 4px 8px -2px #e6f4dd, 0 -4px 8px -2px #e6f4dd;
                     border-radius: 0 3px 3px 0;
                     font-size: 22px;
                     color: #1f2937;
                     background: #ffffff;
                     transition: all 0.2s ease;
                     margin-left: 0;
+                    order: 2;
                 }
 
                 .kray-search-input::placeholder {
@@ -184,20 +172,23 @@
 
                 .kray-search-button {
                     background: #80C343;
-                    border: 1px solid #003E4A;
-                    box-shadow: 0 2px 8px 0 rgba(128, 195, 67, 0.18);
-                    border-radius: 0 3px 3px 0;
-                    padding: 0 18px;
-                    height: 56px;
-                    min-width: 56px;
+                    border: none;
+                    box-shadow: none;
+                    border-radius: 3px;
+                    padding: 0 12px;
+                    height: 48px;
+                    min-width: 48px;
                     cursor: pointer;
                     transition: background 0.2s ease;
                     font-size: 18px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    margin-left: -6px;
-                    z-index: 2;
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    margin-left: 0;
+                    z-index: 3;
                 }
 
                 .kray-search-button:hover {
@@ -209,9 +200,33 @@
                 }
 
                 .kray-search-icon {
-                    width: 20px;
-                    height: 20px;
-                    fill: #ffffff;
+                    width: 32px;
+                    height: 32px;
+                    fill: #003E4A;
+                }
+                .kray-action-btn svg {
+                    width: 32px;
+                    height: 32px;
+                }
+                .kray-action-btn.primary {
+                    font-size: 28px;
+                }
+                @media (max-width: 1280px) {
+                    .kray-search-icon {
+                        width: 20px !important;
+                        height: 20px !important;
+                    }
+                    .kray-action-btn svg {
+                        width: 20px !important;
+                        height: 20px !important;
+                    }
+                    .kray-action-btn.primary {
+                        font-size: 14px !important;
+                    }
+                }
+
+                .kray-search-button:hover .kray-search-icon {
+                    fill: #fff;
                 }
 
                 /* Action buttons section */
@@ -219,11 +234,10 @@
                     flex-shrink: 0;
                     display: flex;
                     align-items: center;
-                    gap: 12px;
                 }
 
                 .kray-action-btn {
-                    padding: 0 22px;
+                    padding: 0 12px;
                     height: 56px;
                     background: #ffffff;
                     border: 1px solid #003E4A;
@@ -237,7 +251,7 @@
                     display: inline-flex;
                     align-items: center;
                     gap: 6px;
-                    margin-left: 16px;
+                    margin-left: 12px;
                 }
 
                 .kray-action-btn:hover {
@@ -252,6 +266,10 @@
                     font-weight: 600;
                 }
 
+                .kray-phone-text {
+                    display: none;
+                }
+
                 .kray-action-btn.primary:hover {
                     background: #003E4A;
                     color: #fff;
@@ -263,6 +281,7 @@
                     height: 80px;
                     border-radius: 4px;
                     overflow: hidden;
+                    margin-left: 12px;
                 }
 
                 .kray-flag img {
@@ -272,50 +291,118 @@
                 }
 
                 /* Responsive design */
-                @media (max-width: 1024px) {
+
+                /* Mobile: hide USA flag, align action buttons in one row, search bar below */
+                @media (max-width: 1280px) {
                     .kray-header-inner {
-                        gap: 12px;
+                        flex-direction: column;
+                        align-items: stretch;
+                        gap: 0;
+                        padding: 12px 2vw 18px 2vw;
                     }
-
-                    .kray-search-wrapper {
-                        max-width: 400px;
+                    .client-site-logo {
+                        order: 1;
+                        justify-content: center;
+                        margin-bottom: 8px;
+                        width: 100%;
+                        min-width: 0;
+                        flex: 1 1 0;
+                        max-width: none;
                     }
-
-                    .kray-action-btn span {
-                        display: none;
+                    .kray-actions {
+                        order: 2;
+                        flex-direction: row;
+                        flex-wrap: nowrap;
+                        justify-content: flex-start;
+                        align-items: center;
+                        gap: 2px;
+                        margin-bottom: 8px;
+                        width: 100%;
+                        min-width: 0;
+                        flex: 1 1 0;
+                        max-width: none;
                     }
-                }
-
-                @media (max-width: 768px) {
-                    .kray-header-inner {
-                        flex-wrap: wrap;
-                        padding: 12px 16px;
+                    .kray-action-btn {
+                        margin-left: 0 !important;
+                        margin-right: 0 !important;
+                        width: 100%;
+                        min-width: 0;
+                        flex: 1 1 0;
+                        max-width: none;
+                        box-sizing: border-box;
+                        padding: 0 12px;
+                        font-size: 14px;
+                        height: 48px;
                     }
-
+                    .kray-action-btn:nth-child(1) {
+                        order: 2;
+                        flex: 1 1 auto;
+                    }
+                    .kray-action-btn:nth-child(1) .kray-phone-text {
+                        display: inline;
+                    }
+                    .kray-action-btn:nth-child(2) {
+                        order: 3;
+                        flex: 0 0 auto;
+                        width: auto;
+                    }
+                    .kray-action-btn:nth-child(3) {
+                        order: 1;
+                        flex: 1 1 auto;
+                    }
+                    .kray-actions .kray-flag {
+                        display: none !important;
+                    }
+                    .kray-category {
+                        order: 1;
+                        width: auto;
+                        margin-bottom: 0;
+                        margin-left: 0 !important;
+                        min-width: 0;
+                        flex: 0 0 auto;
+                        max-width: none;
+                    }
                     .kray-search-wrapper {
                         order: 3;
-                        flex-basis: 100%;
+                        width: 100%;
                         max-width: 100%;
+                        margin: 0;
+                        display: flex;
+                        flex-direction: row;
+                        gap: 0;
+                        min-width: 0;
+                        flex: 1 1 auto;
                     }
-
                     .kray-category-select {
-                        min-width: 100px;
-                        font-size: 13px;
+                        font-size: 14px !important;
+                        height: 48px !important;
+                        min-width: 0 !important;
+                        width: auto !important;
+                        flex: 0 0 auto !important;
+                        max-width: 80px !important;
+                        margin-right: 0 !important;
+                        margin-left: 0 !important;
+                        border-radius: 3px 0 0 3px;
+                        box-sizing: border-box;
+                        padding: 0 12px 0 12px !important;
                     }
-
-                    .kray-actions {
-                        gap: 8px;
+                    .kray-search-input {
+                        font-size: 16px !important;
+                        height: 48px !important;
+                        padding: 0 48px 0 14px !important;
+                        min-width: 0 !important;
+                        flex: 1 1 auto !important;
+                        width: 100% !important;
+                        max-width: none !important;
+                        border-radius: 0 3px 3px 0;
                     }
-                }
-
-                @media (max-width: 480px) {
-                    .kray-logo-text {
-                        font-size: 16px;
-                    }
-
-                    .kray-action-btn {
-                        padding: 8px 12px;
-                        font-size: 13px;
+                    .kray-search-button {
+                        height: 40px;
+                        min-width: 0;
+                        top: 4px;
+                        right: 4px;
+                        padding: 0 10px;
+                        flex: 0 1 auto;
                     }
                 }
             </style>
@@ -323,32 +410,31 @@
             <header class="kray-header">
                 <div class="kray-header-inner">
                     <!-- Logo -->
-                    <div class="kray-logo">
-                        <a href="/" class="kray-logo-text">
+                    <div class="client-site-logo">
+                        <a href="/" class="client-site-logo-text">
                             <img src="https://www.casterconcepts.com/wp-content/uploads/2023/06/Caster-Concepts-Web-logo.png" alt="Logo">
                         </a>
                     </div>
 
-                    <!-- Category Dropdown -->
-                    <div class="kray-category">
-                        <select class="kray-category-select" id="kray-category-select" aria-label="Select category">
-                            <option value="all">All</option>
-                            <option value="all-products">All Products</option>
-                            <option value="casters">Casters</option>
-                            <option value="wheels">Wheels</option>
-                            <option value="accessories">Accessories</option>
-                            <option value="replacement-parts">Replacement Parts</option>
-                            <option value="learning-center">Learning Center</option>
-                        </select>
-                    </div>
-
-                    <!-- Search Bar -->
+                    <!-- Search Bar with Dropdown -->
                     <div class="kray-search-wrapper">
+                        <!-- Category Dropdown -->
+                        <div class="kray-category">
+                            <select class="kray-category-select" id="kray-category-select" aria-label="Select category">
+                                <option value="all">All</option>
+                                <option value="all-products">All Products</option>
+                                <option value="casters">Casters</option>
+                                <option value="wheels">Wheels</option>
+                                <option value="accessories">Accessories</option>
+                                <option value="replacement-parts">Replacement Parts</option>
+                                <option value="learning-center">Learning Center</option>
+                            </select>
+                        </div>
                         <input 
                             type="text" 
                             class="kray-search-input" 
                             id="kray-search-input"
-                            placeholder="Try 'casters carrying load of 15,000 lbs'"
+                            placeholder="Try 'noise reducing casters'"
                             aria-label="Search"
                         >
                         <button class="kray-search-button" id="kray-search-button" aria-label="Search">
@@ -360,22 +446,21 @@
 
                     <!-- Action Buttons -->
                     <div class="kray-actions">
-                        <a href="tel:+1234567890" class="kray-action-btn" aria-label="Call us">
+                        <a href="tel:+18887641698" class="kray-action-btn" aria-label="Call us">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
                             </svg>
-                        
+                            <span class="kray-phone-text">(888) 764-1698</span>
                         </a>
                         <a href="/profile" class="kray-action-btn" aria-label="Profile">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                             </svg>
-                        
                         </a>
                         <a href="/quote" class="kray-action-btn primary" aria-label="Request a quote">
                             <span>$</span> Request a Quote
                         </a>
-                        <a href="" class="kray-flag" aria-label="Made in USA">
+                        <a href="/" class="kray-flag" aria-label="Made in USA">
                             <img src="https://www.casterconcepts.com/wp-content/uploads/2025/06/MIA-logo.png" alt="Made in USA">
                         </a>
                     </div>
