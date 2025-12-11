@@ -5,7 +5,7 @@
 // @match        https://www.casterconcepts.com/*
 // @run-at       document-start
 // @grant        none
-// @require      http://127.0.0.1:5500/javascript/header/client_header.js
+// @require      https://cdn.jsdelivr.net/gh/pacecoderPR/cdn-script-delivery/javascript/header/client_header.js
 // @description  Initializing Header
 // ==/UserScript==
 
