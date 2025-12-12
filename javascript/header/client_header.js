@@ -358,7 +358,7 @@
                     .kray-mobile-menu-btn {
                         display: block;
                         position: absolute;
-                        top: 16px;
+                        top: 38px;
                         right: 2vw;
                     }
                     .kray-actions {
