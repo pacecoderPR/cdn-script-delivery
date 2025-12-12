@@ -222,6 +222,7 @@
                     }
                     .kray-action-btn.primary {
                         font-size: 14px !important;
+                        margin-left: 12px !important;
                     }
                 }
 
@@ -290,6 +291,22 @@
                     object-fit: cover;
                 }
 
+                /* Mobile menu button */
+                .kray-mobile-menu-btn {
+                    display: none;
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    padding: 8px;
+                    z-index: 10;
+                }
+
+                .kray-mobile-menu-btn svg {
+                    width: 32px;
+                    height: 32px;
+                    fill: #ffffff;
+                }
+
                 /* Responsive design */
 
                 /* Mobile: hide USA flag, align action buttons in one row, search bar below */
@@ -298,16 +315,35 @@
                         flex-direction: column;
                         align-items: stretch;
                         gap: 0;
-                        padding: 12px 2vw 18px 2vw;
+                        padding: 0;
+                        position: relative;
+                        margin: 0;
+                        max-width: 100%;
                     }
                     .client-site-logo {
                         order: 1;
-                        justify-content: center;
-                        margin-bottom: 8px;
+                        justify-content: flex-start;
+                        margin-bottom: 12px;
                         width: 100%;
                         min-width: 0;
                         flex: 1 1 0;
                         max-width: none;
+                        position: relative;
+                        padding: 6px 2vw;
+                        background: #003E4A;
+                    }
+                    .client-site-logo img {
+                        content: url('https://www.casterconcepts.com/wp-content/uploads/2023/01/cci-logo-inverted.png');
+                        background: transparent;
+                        padding: 0 8px;
+                        border-radius: 0;
+                        height: 48px;
+                    }
+                    .kray-mobile-menu-btn {
+                        display: block;
+                        position: absolute;
+                        top: 16px;
+                        right: 2vw;
                     }
                     .kray-actions {
                         order: 2;
@@ -345,6 +381,7 @@
                         order: 3;
                         flex: 0 0 auto;
                         width: auto;
+                        margin-right: 12px !important;
                     }
                     .kray-action-btn:nth-child(3) {
                         order: 1;
@@ -361,6 +398,7 @@
                         min-width: 0;
                         flex: 0 0 auto;
                         max-width: none;
+                        margin-left: 12px !important;
                     }
                     .kray-search-wrapper {
                         order: 3;
@@ -395,6 +433,7 @@
                         width: 100% !important;
                         max-width: none !important;
                         border-radius: 0 3px 3px 0;
+                        margin-right: 12px !important;
                     }
                     .kray-search-button {
                         height: 40px;
@@ -403,6 +442,7 @@
                         right: 4px;
                         padding: 0 10px;
                         flex: 0 1 auto;
+                        margin-right: 12px;
                     }
                 }
             </style>
@@ -415,6 +455,13 @@
                             <img src="https://www.casterconcepts.com/wp-content/uploads/2023/06/Caster-Concepts-Web-logo.png" alt="Logo">
                         </a>
                     </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button class="kray-mobile-menu-btn" id="kray-mobile-menu-btn" aria-label="Menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                        </svg>
+                    </button>
 
                     <!-- Search Bar with Dropdown -->
                     <div class="kray-search-wrapper">
