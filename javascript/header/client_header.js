@@ -56,7 +56,6 @@
                 .kray-header {
                     width: 100%;
                     background: #ffffff;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                     position: relative;
                     z-index: 9999;
@@ -66,7 +65,7 @@
                 .kray-header-inner {
                     max-width: 2200px;
                     margin: 0 100.4px;
-                    padding: 32px 12px;
+                    padding: 32px 12px 0px 12px;
                     min-height: 90px;
                     display: flex;
                     align-items: center;
@@ -314,7 +313,7 @@
                 @media (min-width: 1920px) {
                     .kray-header-inner {
                         margin: 0 293px;
-                        padding: 12px;
+                        padding: 32px 12px 0px 12px;
                     }
                 }
                 
@@ -332,7 +331,7 @@
                         flex-direction: column;
                         align-items: stretch;
                         gap: 0;
-                        padding: 0 12px;
+                        padding: 32px 12px 0px 12px;
                         position: relative;
                         margin: 0;
                         max-width: 100%;
@@ -359,7 +358,7 @@
                     .kray-mobile-menu-btn {
                         display: block;
                         position: absolute;
-                        top: 16px;
+                        top: 38px;
                         right: 2vw;
                     }
                     .kray-actions {
@@ -394,7 +393,7 @@
                     .kray-action-btn:nth-child(1) .kray-phone-text {
                         display: inline;
                     }
-                    .kray-action-btn:nth-child(2) {̥
+                    .kray-action-btn:nth-child(2) {
                         order: 3;
                         flex: 0 0 auto;
                         width: auto;
