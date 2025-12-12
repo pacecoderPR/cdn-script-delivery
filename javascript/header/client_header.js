@@ -65,8 +65,8 @@
                 /* Inner wrapper for content */
                 .kray-header-inner {
                     max-width: 2200px;
-                    margin: 0 auto;
-                    padding: 32px 80px;
+                    margin: 0 100.4px;
+                    padding: 32px 12px;
                     min-height: 90px;
                     display: flex;
                     align-items: center;
@@ -309,13 +309,30 @@
 
                 /* Responsive design */
 
+                
+                /* Full HD screens: 1920px */
+                @media (min-width: 1920px) {
+                    .kray-header-inner {
+                        margin: 0 293px;
+                        padding: 12px;
+                    }
+                }
+                
+
+                 /* 2k/4k screens: larger horizontal margin */
+                @media (min-width: 2560px) {
+                    .kray-header-inner {
+                        margin: 0 612.33px;
+                    }
+                }
+
                 /* Mobile: hide USA flag, align action buttons in one row, search bar below */
                 @media (max-width: 1280px) {
                     .kray-header-inner {
                         flex-direction: column;
                         align-items: stretch;
                         gap: 0;
-                        padding: 0;
+                        padding: 0 12px;
                         position: relative;
                         margin: 0;
                         max-width: 100%;
@@ -377,7 +394,7 @@
                     .kray-action-btn:nth-child(1) .kray-phone-text {
                         display: inline;
                     }
-                    .kray-action-btn:nth-child(2) {
+                    .kray-action-btn:nth-child(2) {̥
                         order: 3;
                         flex: 0 0 auto;
                         width: auto;
