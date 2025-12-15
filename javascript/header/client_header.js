@@ -64,12 +64,13 @@
                 /* Inner wrapper for content */
                 .kray-header-inner {
                     max-width: 2200px;
-                    margin: 0 100.4px;
-                    padding: 32px 12px 0px 12px;
-                    min-height: 90px;
+                    margin: 0 80px;
+                    padding: 12px 0;
+                    min-height: auto;
                     display: flex;
                     align-items: center;
-                    justify-content: space-between;
+                    justify-content: flex-start;
+                    gap: 0px;
                 }
 
                 /* Logo section */
@@ -77,35 +78,35 @@
                     flex-shrink: 0;
                     display: flex;
                     align-items: center;
+                    width: 243px;
+                    height: 66px;
+                    margin-right: 25px;
                 }
 
                 .client-site-logo img {
-                    height: 67px;
-                    width: auto;
-                }
-
-                .client-site-logo-text {
-                    font-size: 26px;
-                    font-weight: 700;
-                    color: #222;
-                    text-decoration: none;
+                    height: 66px;
+                    width: 243px;
+                    object-fit: contain;
                 }
 
                 /* Category dropdown */
                 .kray-category {
-                    flex-shrink: 1;
-                    margin-left: 36px;
+                    flex-shrink: 0;
+                    margin-left: 0;
+                    margin-right: 0;
                     position: relative;
-                    min-width: 0;
+                    width: 83px;
+                    height: 44px;
                 }
 
                 .kray-category-select {
-                    height: 56px;
-                    padding: 0 40px 0 20px;
+                    height: 44px;
+                    width: 83px;
+                    padding: 0 12px;
                     border: 1.5px solid #003E4A;
                     box-shadow: -4px 0 8px -2px #e6f4dd, 0 4px 8px -2px #e6f4dd, 0 -4px 8px -2px #e6f4dd;
                     border-radius: 3px;
-                    font-size: 18px;
+                    font-size: 14px;
                     color: #374151;
                     background: #ffffff;
                     cursor: pointer;
@@ -114,93 +115,65 @@
                     -moz-appearance: none;
                     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
                     background-repeat: no-repeat;
-                    background-position: right 16px center;
-                    width: 100%;
-                    max-width: 340px;
-                    min-width: 90px;
-                    margin-right: 0;
-                    position: relative;
-                    z-index: 2;
-                }
-
-                .kray-category-select:hover {
-                    border-color: #003E4A;
-                }
-
-                .kray-category-select:focus {
-                    outline: none;
-                    border-color: #003E4A;
+                    background-position: right 8px center;
+                    box-sizing: border-box;
                 }
 
                 /* Search bar section */
                 .kray-search-wrapper {
-                    flex: 4;
-                    max-width: 100%;
+                    flex: 1 1 auto;   /* 👈 grow with screen */
+                    max-width: 900px; /* optional safety cap */
+                    height: 44px;
                     display: flex;
-                    flex-direction: row;
                     position: relative;
+                    margin-right: 12px;
                 }
 
                 .kray-search-input {
                     width: 100%;
-                    height: 56px;
-                    padding: 0 60px 0 20px;
+                    min-width: 316px;
+                    height: 44px;
+                    padding: 0 40px 0 12px;
                     border: 1.5px solid #003E4A;
                     box-shadow: 4px 0 8px -2px #e6f4dd, 0 4px 8px -2px #e6f4dd, 0 -4px 8px -2px #e6f4dd;
-                    border-radius: 0 3px 3px 0;
-                    font-size: 22px;
+                    border-radius: 3px;
+                    font-size: 14px;
                     color: #1f2937;
                     background: #ffffff;
                     transition: all 0.2s ease;
-                    margin-left: 0;
-                    order: 2;
+                    box-sizing: border-box;
+                    order: 1;
                 }
 
                 .kray-search-input::placeholder {
                     color: #9ca3af;
-                }
-
-                .kray-search-input:hover {
-                    border-color: #003E4A;
-                }
-
-                .kray-search-input:focus {
-                    outline: none;
-                    border-color: #003E4A;
+                    font-size: 12px;
                 }
 
                 .kray-search-button {
                     background: #80C343;
-                    border: none;
+                    border: 1.5px solid #003E4A;
                     box-shadow: none;
                     border-radius: 3px;
-                    padding: 0 12px;
-                    height: 48px;
-                    min-width: 48px;
+                    padding: 0;
+                    height: 44px;
+                    width: 44px;
+                    min-width: 44px;
                     cursor: pointer;
                     transition: background 0.2s ease;
-                    font-size: 18px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     position: absolute;
-                    top: 4px;
-                    right: 4px;
-                    margin-left: 0;
+                    top: 0;
+                    right: 0;
                     z-index: 3;
-                }
-
-                .kray-search-button:hover {
-                    background: #003E4A;
-                }
-
-                .kray-search-button:active {
-                    background: #4d7c0f;
+                    flex-shrink: 0;
                 }
 
                 .kray-search-icon {
-                    width: 32px;
-                    height: 32px;
+                    width: 20px;
+                    height: 20px;
                     fill: #003E4A;
                 }
                 .kray-action-btn svg {
@@ -221,6 +194,7 @@
                     }
                     .kray-action-btn.primary {
                         font-size: 14px !important;
+                        margin-left: 12px !important;
                     }
                 }
 
@@ -233,11 +207,13 @@
                     flex-shrink: 0;
                     display: flex;
                     align-items: center;
+                    gap: 12px;
                 }
 
                 .kray-action-btn {
-                    padding: 0 12px;
-                    height: 56px;
+                    width: 44px;
+                    height: 44px;
+                    padding: 0;
                     background: #ffffff;
                     border: 1px solid #003E4A;
                     box-shadow: 0 2px 8px 0 rgba(128, 195, 67, 0.18);
@@ -249,8 +225,14 @@
                     text-decoration: none;
                     display: inline-flex;
                     align-items: center;
-                    gap: 6px;
-                    margin-left: 12px;
+                    justify-content: center;
+                    gap: 0;
+                    flex-shrink: 0;
+                }
+
+                .kray-action-btn svg {
+                    width: 20px;
+                    height: 20px;
                 }
 
                 .kray-action-btn:hover {
@@ -259,10 +241,15 @@
                 }
 
                 .kray-action-btn.primary {
+                    width: 148px;
+                    height: 44px;
                     background: #80C343;
                     color: #003E4A;
                     border-color: #003E4A;
                     font-weight: 600;
+                    font-size: 13px;
+                    padding: 0 12px;
+                    gap: 4px;
                 }
 
                 .kray-phone-text {
@@ -276,11 +263,14 @@
 
                 /* USA Flag */
                 .kray-flag {
-                    width: 110px;
-                    height: 80px;
+                    width: 90px;
+                    height: 65.9px;
                     border-radius: 4px;
                     overflow: hidden;
-                    margin-left: 12px;
+                    margin: 0;
+                    border: none;
+                    box-shadow: none;
+                    padding: 0;
                 }
 
                 .kray-flag img {
@@ -314,12 +304,10 @@
                 @media (min-width: 1920px) {
                     .kray-header-inner {
                         margin: 0 293px;
-                        padding: 32px 12px 0px 12px;
                     }
                 }
-                
 
-                 /* 2k/4k screens: larger horizontal margin */
+                /* 2k/4k screens: larger horizontal margin */
                 @media (min-width: 2560px) {
                     .kray-header-inner {
                         margin: 0 612.33px;
@@ -327,7 +315,7 @@
                 }
 
                 /* Mobile: hide USA flag, align action buttons in one row, search bar below */
-                @media (max-width: 1280px) {
+                @media (max-width: 1199px) {
                     .kray-header-inner {
                         flex-direction: column;
                         align-items: stretch;
@@ -340,7 +328,7 @@
                     .client-site-logo {
                         order: 1;
                         justify-content: flex-start;
-                        margin-bottom: 0;
+                        margin-bottom: 12px;
                         width: 100%;
                         min-width: 0;
                         flex: 1 1 0;
@@ -348,6 +336,7 @@
                         position: relative;
                         padding: 12px 20px;
                         background: #003E4A;
+                        height: auto;
                     }
                     .client-site-logo img {
                         content: url('https://www.casterconcepts.com/wp-content/uploads/2023/01/cci-logo-inverted.png');
@@ -355,6 +344,7 @@
                         padding: 0;
                         border-radius: 0;
                         height: 48px;
+                        width: auto;
                     }
                     .kray-mobile-menu-btn {
                         display: block !important;
@@ -893,25 +883,27 @@
                         width: auto;
                         margin-bottom: 0;
                         margin-left: 0 !important;
+                        margin-right: 0;
                         min-width: 0;
                         flex: 0 0 auto;
                         max-width: none;
+                        margin-left: 12px !important;
                     }
                     .kray-search-wrapper {
                         order: 3;
-                        width: calc(100% - 40px);
-                        max-width: none;
-                        margin: 0 20px 12px 20px;
+                        width: 100%;
+                        max-width: 100%;
+                        margin: 0;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
                         min-width: 0;
-                        flex: 0 0 auto;
+                        flex: 1 1 auto;
                     }
                     .kray-category-select {
                         font-size: 14px !important;
-                        height: 44px !important;
-                        min-width: 60px !important;
+                        height: 48px !important;
+                        min-width: 0 !important;
                         width: auto !important;
                         flex: 0 0 auto !important;
                         max-width: 80px !important;
@@ -919,91 +911,27 @@
                         margin-left: 0 !important;
                         border-radius: 3px 0 0 3px;
                         box-sizing: border-box;
-                        padding: 0 24px 0 12px !important;
+                        padding: 0 12px 0 12px !important;
                     }
                     .kray-search-input {
-                        font-size: 14px !important;
-                        height: 44px !important;
-                        padding: 0 44px 0 12px !important;
+                        font-size: 16px !important;
+                        height: 48px !important;
+                        padding: 0 48px 0 14px !important;
                         min-width: 0 !important;
                         flex: 1 1 auto !important;
                         width: 100% !important;
                         max-width: none !important;
                         border-radius: 0 3px 3px 0;
+                        margin-right: 12px !important;
                     }
                     .kray-search-button {
-                        height: 36px;
-                        min-width: 36px;
+                        height: 40px;
+                        min-width: 0;
                         top: 4px;
                         right: 4px;
-                        padding: 0 8px;
-                    }
-                }
-
-                /* Extra small screens: 348px and below - hide phone text, show only icons */
-                @media (max-width: 348px) {
-                    .kray-actions {
-                        gap: 6px;
-                        margin: 10px 12px;
-                        width: calc(100% - 24px);
-                    }
-                    .kray-action-btn {
-                        margin-left: 0 !important;
-                        margin-right: 0 !important;
-                        min-width: 0;
-                        box-sizing: border-box;
-                        padding: 0 8px;
-                        font-size: 11px;
-                        height: 44px;
-                        justify-content: center;
-                        text-align: center;
-                    }
-                    .kray-action-btn:nth-child(3) {
-                        flex: 0 0 148px;
-                        width: 148px;
-                        font-size: 11px;
-                        padding: 0 6px;
-                    }
-                    .kray-action-btn:nth-child(1) {
-                        flex: 1 1 auto;
-                        min-width: 44px;
-                    }
-                    .kray-action-btn:nth-child(1) .kray-phone-text {
-                        display: inline;
-                        font-size: 10px;
-                    }
-                    .kray-action-btn:nth-child(2) {
-                        flex: 0 0 40px;
-                        width: 40px;
-                    }
-                    .kray-search-wrapper {
-                        width: calc(100% - 24px);
-                        margin: 0 12px 10px 12px;
-                        max-width: calc(100% - 24px);
-                    }
-                    .kray-category-select {
-                        max-width: 60px !important;
-                        font-size: 12px !important;
-                        padding: 0 20px 0 8px !important;
-                    }
-                    .kray-search-input {
-                        font-size: 12px !important;
-                    }
-                    .client-site-logo {
-                        padding: 10px 12px;
-                    }
-                    .kray-mobile-menu-btn {
-                        top: 12px;
-                        right: 12px;
-                        padding: 12px;
-                        height: 48px;
-                        width: 48px;
-                    }
-                    .kray-mobile-menu-btn svg {
-                        width: 24px;
-                        height: 24px;
-                        fill: #ffffff;
-                        display: block;
+                        padding: 0 10px;
+                        flex: 0 1 auto;
+                        margin-right: 12px;
                     }
                 }
             </style>
