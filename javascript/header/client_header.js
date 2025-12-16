@@ -22,35 +22,60 @@
                 secondRow.style.visibility = "visible";
             }
 
-            // Hide mobile-header, menu-compare-icon, and headernew elements only if NOT in 1200-1440px range
-            const viewportWidth = window.innerWidth;
-            const shouldHide = viewportWidth < 1200 ;
+            // Hide mobile-header, menu-compare-icon, and headernew elements for all widths below 1200px
+            // Show them for widths 1200px and above
+                // const viewportWidth = window.innerWidth;
+                // const shouldHide = viewportWidth < 1200;
 
-            if (shouldHide) {
-                const mobileHeaders = document.querySelectorAll(".mobile-header");
-                mobileHeaders.forEach(header => {
-                    header.style.display = "none";
-                    header.style.visibility = "hidden";
-                    header.style.opacity = "0";
-                    header.style.pointerEvents = "none";
-                });
+                // const mobileHeaders = document.querySelectorAll(".mobile-header");
+                // const compareIcons = document.querySelectorAll(".menu-compare-icon");
+                // const headerNewElements = document.querySelectorAll(".headernew");
 
-                const compareIcons = document.querySelectorAll(".menu-compare-icon");
-                compareIcons.forEach(icon => {
-                    icon.style.display = "none";
-                    icon.style.visibility = "hidden";
-                    icon.style.opacity = "0";
-                    icon.style.pointerEvents = "none";
-                });
+                // if (shouldHide) {
+                //     // Hide elements for screens below 1200px
+                //     mobileHeaders.forEach(header => {
+                //         header.style.display = "none";
+                //         header.style.visibility = "hidden";
+                //         header.style.opacity = "0";
+                //         header.style.pointerEvents = "none";
+                //     });
 
-                const headerNewElements = document.querySelectorAll(".headernew");
-                headerNewElements.forEach(element => {
-                    element.style.display = "none";
-                    element.style.visibility = "hidden";
-                    element.style.opacity = "0";
-                    element.style.pointerEvents = "none";
-                });
-            }
+                //     compareIcons.forEach(icon => {
+                //         icon.style.display = "none";
+                //         icon.style.visibility = "hidden";
+                //         icon.style.opacity = "0";
+                //         icon.style.pointerEvents = "none";
+                //     });
+
+                //     headerNewElements.forEach(element => {
+                //         element.style.display = "none";
+                //         element.style.visibility = "hidden";
+                //         element.style.opacity = "0";
+                //         element.style.pointerEvents = "none";
+                //     });
+                // } else {
+                //     // Show elements for screens 1200px and above
+                //     mobileHeaders.forEach(header => {
+                //         header.style.display = "";
+                //         header.style.visibility = "";
+                //         header.style.opacity = "";
+                //         header.style.pointerEvents = "";
+                //     });
+
+                //     compareIcons.forEach(icon => {
+                //         icon.style.display = "";
+                //         icon.style.visibility = "";
+                //         icon.style.opacity = "";
+                //         icon.style.pointerEvents = "";
+                //     });
+
+                //     headerNewElements.forEach(element => {
+                //         element.style.display = "";
+                //         element.style.visibility = "";
+                //         element.style.opacity = "";
+                //         element.style.pointerEvents = "";
+                //     });
+            // }
         }
 
     /**
@@ -87,6 +112,15 @@
                     visibility: hidden !important;
                     opacity: 0 !important;
                     pointer-events: none !important;
+                }
+
+                @media (min-width: 1200px) {
+                    .mobile-header {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        pointer-events: auto !important;
+                    }
                 }
 
                 /* Main header container */
@@ -910,6 +944,8 @@
                         max-width: none;
                         width: 128px;
                         font-size: 13px;
+                        margin-left: 5px !important;
+
 
                     
                     }
@@ -929,6 +965,8 @@
                         flex: 0 0 44px;
                         width: 44px;
                         min-width: 44px;
+                        margin-right: 5px !important;
+
                     }
                     /* Hide flag */
                     .kray-actions .kray-flag {
@@ -949,7 +987,7 @@
                         order: 3;
                         width: 100%;
                         max-width: 100%;
-                        margin: 0;
+                        margin: 10px 2px 0px 1px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
@@ -958,7 +996,7 @@
                     }
                     .kray-category-select {
                         font-size: 14px !important;
-                        height: 48px !important;
+                        height: 44px !important;
                         min-width: 0 !important;
                         width: auto !important;
                         flex: 0 0 auto !important;
@@ -971,7 +1009,7 @@
                     }
                     .kray-search-input {
                         font-size: 16px !important;
-                        height: 48px !important;
+                        height: 44px !important;
                         padding: 0 48px 0 14px !important;
                         min-width: 0 !important;
                         flex: 1 1 auto !important;
@@ -983,14 +1021,15 @@
                     .kray-search-button {
                         background: #80C343;
                         border: 1.5px solid #003E4A;
-                        box-shadow: none;
+                        border-width: 0px 0px 0px 1.5px;
                         border-radius: 0px;
-                        height: 44px;
+                        height: 41.5px;
                         width: 44px;
                         min-width: 44px;
                         padding: 0;
-                        top: 2px;
-                        right: 14px;
+                        top: 1px;
+                        bottom: 2px;
+                        right: 13px;
                     }
                 }
 
@@ -998,7 +1037,7 @@
                 @media (min-width: 349px) and (max-width: 400px) {
                     .kray-actions {
                         gap: 4px;
-                        margin: 10px 8px;
+                        margin: 20px 10px 8px 8px;
                         width: calc(100% - 16px);
                     }
                   
@@ -1042,8 +1081,8 @@
                         text-overflow: ellipsis;
                     }
                     .kray-action-btn svg {
-                        width: 56px;
-                        height: 18px;
+                        width: 20px;
+                        height: 20px;
                     }
                     /* Request a Quote - must shrink */
                     .kray-action-btn:nth-child(3) {
@@ -1061,15 +1100,10 @@
                         flex: 1 1 auto;
                         max-width: none;
                         min-width: 0;
-                        width: 113px;
-                        
-
                     }
                     .kray-action-btn:nth-child(1) .kray-phone-text {
                         display: inline;
-                        font-size: 11px;
                         font-size: 12px;
-                        padding-right: 7px;
                     }
                     /* Profile button */
                     .kray-action-btn:nth-child(2) {
