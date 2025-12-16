@@ -194,7 +194,7 @@
                     }
                     .kray-action-btn.primary {
                         font-size: 14px !important;
-                        margin-left: 12px !important;
+                        margin-left: 12px;
                     }
                 }
 
@@ -512,9 +512,9 @@
                     /* Combined row for search and actions */
                     .kray-search-wrapper {
                         order: 2;
-                        width: calc(100% - 527px);
+                        width: calc(100% - 550px);
                         max-width: none;
-                        margin: 14px 400px 12px 80px;
+                        margin: 17px 400px 12px 80px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
