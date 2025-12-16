@@ -21,6 +21,36 @@
                 secondRow.style.display = "";
                 secondRow.style.visibility = "visible";
             }
+
+            // Hide mobile-header, menu-compare-icon, and headernew elements only if NOT in 1200-1440px range
+            const viewportWidth = window.innerWidth;
+            const shouldHide = viewportWidth < 1200 ;
+
+            if (shouldHide) {
+                const mobileHeaders = document.querySelectorAll(".mobile-header");
+                mobileHeaders.forEach(header => {
+                    header.style.display = "none";
+                    header.style.visibility = "hidden";
+                    header.style.opacity = "0";
+                    header.style.pointerEvents = "none";
+                });
+
+                const compareIcons = document.querySelectorAll(".menu-compare-icon");
+                compareIcons.forEach(icon => {
+                    icon.style.display = "none";
+                    icon.style.visibility = "hidden";
+                    icon.style.opacity = "0";
+                    icon.style.pointerEvents = "none";
+                });
+
+                const headerNewElements = document.querySelectorAll(".headernew");
+                headerNewElements.forEach(element => {
+                    element.style.display = "none";
+                    element.style.visibility = "hidden";
+                    element.style.opacity = "0";
+                    element.style.pointerEvents = "none";
+                });
+            }
         }
 
     /**
@@ -51,6 +81,14 @@
                     box-sizing: border-box;
                 }
 
+                /* Hide mobile-header from the live website globally */
+                .mobile-header {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                }
+
                 /* Main header container */
 
                 .kray-header {
@@ -63,8 +101,11 @@
 
                 /* Inner wrapper for content */
                 .kray-header-inner {
-                    max-width: 2200px;
-                    margin: 0 80px;
+                    max-width: clamp(1200px, 85vw, 2200px);
+                    margin-left: clamp(80px, 8vw, 320px);
+                    margin-right: clamp(80px, 8vw, 320px);
+                    margin-top: 50px;
+                    margin-bottom:0px;
                     padding: 12px 0;
                     min-height: auto;
                     display: flex;
@@ -183,20 +224,20 @@
                 .kray-action-btn.primary {
                     font-size: 28px;
                 }
-                @media (max-width: 1280px) {
-                    .kray-search-icon {
-                        width: 20px !important;
-                        height: 20px !important;
-                    }
-                    .kray-action-btn svg {
-                        width: 20px !important;
-                        height: 20px !important;
-                    }
-                    .kray-action-btn.primary {
-                        font-size: 14px !important;
-                        margin-left: 12px;
-                    }
-                }
+                // @media (max-width: 1280px) {
+                //     .kray-search-icon {
+                //         width: 20px !important;
+                //         height: 20px !important;
+                //     }
+                //     .kray-action-btn svg {
+                //         width: 20px !important;
+                //         height: 20px !important;
+                //     }
+                //     .kray-action-btn.primary {
+                //         font-size: 14px !important;
+                //         margin-left: 12px;
+                //     }
+                // }
 
                 .kray-search-button:hover .kray-search-icon {
                     fill: #fff;
@@ -254,6 +295,7 @@
 
                 .kray-phone-text {
                     display: none;
+                    margin-left: 6px;
                 }
 
                 .kray-action-btn.primary:hover {
@@ -296,23 +338,7 @@
                     fill: #ffffff;
                     display: block;
                 }
-
-                /* Responsive design */
-
                 
-                /* Full HD screens: 1920px */
-                @media (min-width: 1920px) {
-                    .kray-header-inner {
-                        margin: 0 293px;
-                    }
-                }
-
-                /* 2k/4k screens: larger horizontal margin */
-                @media (min-width: 2560px) {
-                    .kray-header-inner {
-                        margin: 0 612.33px;
-                    }
-                }
 
                 /* Mobile: hide USA flag, align action buttons in one row, search bar below */
                 @media (max-width: 1199px) {
@@ -421,7 +447,7 @@
                         order: 3;
                         width: calc(100% - 40px);
                         max-width: 308px;
-                        margin: 0 20px 12px 20px;
+                        margin: 10px 20px 12px 20px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
@@ -452,11 +478,16 @@
                         border-radius: 0 3px 3px 0;
                     }
                     .kray-search-button {
-                        height: 36px;
-                        min-width: 36px;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 8px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        height: 44px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 0;
+                        right: 0;
                     }
                 }
 
@@ -512,7 +543,7 @@
                     /* Combined row for search and actions */
                     .kray-search-wrapper {
                         order: 2;
-                        width: calc(100% - 550px);
+                        width: calc(100% - 520px);
                         max-width: none;
                         margin: 17px 400px 12px 80px;
                         display: flex;
@@ -545,11 +576,16 @@
                         border-radius: 0 3px 3px 0;
                     }
                     .kray-search-button {
-                        height: 36px;
-                        min-width: 36px;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 8px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        height: 44px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 0;
+                        right: 0;
                     }
                     .kray-actions {
                         order: 2;
@@ -609,7 +645,6 @@
                         width: 90px;
                         height: 65.9px;
                         flex: 0 0 90px;
-                        margin-left: 8px;
                     }
                     .kray-category {
                         order: 1;
@@ -772,16 +807,27 @@
                         border-radius: 0 3px 3px 0;
                     }
                     .kray-search-button {
-                        height: 36px;
-                        min-width: 36px;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 8px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        height: 44px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 0;
+                        right: 0;
                     }
                 }
 
                 /* Medium small screens: 349px - 628px */
                 @media (min-width: 349px) and (max-width: 628px) {
+                    /* Hide the mobile-header div from the live website */
+                    .mobile-header {
+                        display: none !important;
+                        visibility: hidden !important;
+                    }
+                    
                     .kray-header-inner {
                         flex-direction: column;
                         align-items: stretch;
@@ -833,11 +879,11 @@
                         order: 2;
                         flex-direction: row;
                         flex-wrap: nowrap;
-                        justify-content: flex-start;
+                        justify-content: space-between;
                         align-items: center;
-                        gap: 8px;
-                        margin: 12px 20px;
-                        width: calc(100% - 40px);
+                        gap: 6px;
+                        margin: 12px 12px;
+                        width: calc(100% - 24px);
                         min-width: 0;
                         flex: 0 0 auto;
                         max-width: none;
@@ -847,23 +893,32 @@
                         margin-right: 0 !important;
                         min-width: 0;
                         box-sizing: border-box;
-                        padding: 0 8px;
-                        font-size: 12px;
+                        padding: 0 6px;
+                        font-size: 11px;
                         height: 44px;
                         justify-content: center;
                         text-align: center;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
-                    /* Request a Quote - first in visual order - flexible but min 205px */
+                    /* Request a Quote - first in visual order - flexible */
                     .kray-action-btn:nth-child(3) {
                         order: 1;
-                        min-width: 205px;
-                        flex: 1 1 205px;
+                        min-width: 0;
+                        flex: 1 1 auto;
+                        max-width: none;
+                        width: 128px;
+                        font-size: 13px;
+
+                    
                     }
-                    /* Call button - second in visual order - flexible but min 148px */
+                    /* Call button - second in visual order - flexible */
                     .kray-action-btn:nth-child(1) {
                         order: 2;
-                        min-width: 148px;
-                        flex: 1 1 148px;
+                        min-width: 0;
+                        flex: 1 1 auto;
+                        max-width: none;
                     }
                     .kray-action-btn:nth-child(1) .kray-phone-text {
                         display: inline;
@@ -873,6 +928,7 @@
                         order: 3;
                         flex: 0 0 44px;
                         width: 44px;
+                        min-width: 44px;
                     }
                     /* Hide flag */
                     .kray-actions .kray-flag {
@@ -925,13 +981,103 @@
                         margin-right: 12px !important;
                     }
                     .kray-search-button {
-                        height: 40px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        box-shadow: none;
+                        border-radius: 0px;
+                        height: 44px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 2px;
+                        right: 14px;
+                    }
+                }
+
+                /* Extra small screens - 349px to 400px */
+                @media (min-width: 349px) and (max-width: 400px) {
+                    .kray-actions {
+                        gap: 4px;
+                        margin: 10px 8px;
+                        width: calc(100% - 16px);
+                    }
+                  
+                    /* Request a Quote - smaller at this size */
+                    .kray-action-btn:nth-child(3) {
+                        flex: 1 1 auto;
+                        max-width: none;
                         min-width: 0;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 10px;
-                        flex: 0 1 auto;
-                        margin-right: 12px;
+                    }
+                    /* Call button */
+                    .kray-action-btn:nth-child(1) {
+                        flex: 1 1 auto;
+                        max-width: none;
+                        min-width: 0;
+                    }
+                    .kray-action-btn:nth-child(1) .kray-phone-text {
+                        display: inline;
+                        font-size: 12px;
+                    }
+                    /* Profile button */
+                    .kray-action-btn:nth-child(2) {
+                        flex: 0 0 42px;
+                        width: 42px;
+                        min-width: 42px;
+                    }
+                }
+
+                /* Very small screens - below 349px */
+                @media (max-width: 348px) {
+                    .kray-actions {
+                        gap: 3px;
+                        margin: 8px 6px;
+                        width: calc(100% - 12px);
+                    }
+                    .kray-action-btn {
+                        padding: 0 3px;
+                        font-size: 9px;
+                        height: 44px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .kray-action-btn svg {
+                        width: 56px;
+                        height: 18px;
+                    }
+                    /* Request a Quote - must shrink */
+                    .kray-action-btn:nth-child(3) {
+                        flex: 1 1 auto;
+                        max-width: none;
+                        min-width: 0;
+                        margin-left: 12px !important;
+                        font-size: 13px;
+                        width: 127px;
+
+
+                    }
+                    /* Call button */
+                    .kray-action-btn:nth-child(1) {
+                        flex: 1 1 auto;
+                        max-width: none;
+                        min-width: 0;
+                        width: 113px;
+                        
+
+                    }
+                    .kray-action-btn:nth-child(1) .kray-phone-text {
+                        display: inline;
+                        font-size: 11px;
+                        font-size: 12px;
+                        padding-right: 7px;
+                    }
+                    /* Profile button */
+                    .kray-action-btn:nth-child(2) {
+                        flex: 0 0 40px;
+                        width: 40px;
+                        min-width: 40px;
+                        margin-right: 12px !important;
+
                     }
                 }
             </style>
