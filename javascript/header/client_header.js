@@ -1,3 +1,16 @@
+// Inject custom CSS for live site header#header padding
+function injectHeaderPaddingCSS() {
+    const style = document.createElement('style');
+    style.innerHTML = 'header#header { padding: 140px 20px 15px !important; }';
+    document.head.appendChild(style);
+}
+
+// Run the injection when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectHeaderPaddingCSS);
+} else {
+    injectHeaderPaddingCSS();
+}
 (function() {
     'use strict';
 
@@ -21,6 +34,61 @@
                 secondRow.style.display = "";
                 secondRow.style.visibility = "visible";
             }
+
+            // Hide mobile-header, menu-compare-icon, and headernew elements for all widths below 1200px
+            // Show them for widths 1200px and above
+                // const viewportWidth = window.innerWidth;
+                // const shouldHide = viewportWidth < 1200;
+
+                // const mobileHeaders = document.querySelectorAll(".mobile-header");
+                // const compareIcons = document.querySelectorAll(".menu-compare-icon");
+                // const headerNewElements = document.querySelectorAll(".headernew");
+
+                // if (shouldHide) {
+                //     // Hide elements for screens below 1200px
+                //     mobileHeaders.forEach(header => {
+                //         header.style.display = "none";
+                //         header.style.visibility = "hidden";
+                //         header.style.opacity = "0";
+                //         header.style.pointerEvents = "none";
+                //     });
+
+                //     compareIcons.forEach(icon => {
+                //         icon.style.display = "none";
+                //         icon.style.visibility = "hidden";
+                //         icon.style.opacity = "0";
+                //         icon.style.pointerEvents = "none";
+                //     });
+
+                //     headerNewElements.forEach(element => {
+                //         element.style.display = "none";
+                //         element.style.visibility = "hidden";
+                //         element.style.opacity = "0";
+                //         element.style.pointerEvents = "none";
+                //     });
+                // } else {
+                //     // Show elements for screens 1200px and above
+                //     mobileHeaders.forEach(header => {
+                //         header.style.display = "";
+                //         header.style.visibility = "";
+                //         header.style.opacity = "";
+                //         header.style.pointerEvents = "";
+                //     });
+
+                //     compareIcons.forEach(icon => {
+                //         icon.style.display = "";
+                //         icon.style.visibility = "";
+                //         icon.style.opacity = "";
+                //         icon.style.pointerEvents = "";
+                //     });
+
+                //     headerNewElements.forEach(element => {
+                //         element.style.display = "";
+                //         element.style.visibility = "";
+                //         element.style.opacity = "";
+                //         element.style.pointerEvents = "";
+                //     });
+            // }
         }
 
     /**
@@ -51,20 +119,40 @@
                     box-sizing: border-box;
                 }
 
+                /* Hide mobile-header from the live website globally */
+                .mobile-header {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                }
+
+                @media (min-width: 1200px) {
+                    .mobile-header {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        pointer-events: auto !important;
+                    }
+                }
+
                 /* Main header container */
 
                 .kray-header {
                     width: 100%;
                     background: #ffffff;
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                    position: relative;
+                    position: fixed;
                     z-index: 9999;
                 }
 
                 /* Inner wrapper for content */
                 .kray-header-inner {
-                    max-width: 2200px;
-                    margin: 0 80px;
+                    max-width: clamp(1200px, 85vw, 2200px);
+                    margin-left: clamp(80px, 8vw, 320px);
+                    margin-right: clamp(80px, 8vw, 320px);
+                    margin-top: 50px;
+                    margin-bottom:0px;
                     padding: 12px 0;
                     min-height: auto;
                     display: flex;
@@ -183,20 +271,20 @@
                 .kray-action-btn.primary {
                     font-size: 28px;
                 }
-                @media (max-width: 1280px) {
-                    .kray-search-icon {
-                        width: 20px !important;
-                        height: 20px !important;
-                    }
-                    .kray-action-btn svg {
-                        width: 20px !important;
-                        height: 20px !important;
-                    }
-                    .kray-action-btn.primary {
-                        font-size: 14px !important;
-                        margin-left: 12px;
-                    }
-                }
+                // @media (max-width: 1280px) {
+                //     .kray-search-icon {
+                //         width: 20px !important;
+                //         height: 20px !important;
+                //     }
+                //     .kray-action-btn svg {
+                //         width: 20px !important;
+                //         height: 20px !important;
+                //     }
+                //     .kray-action-btn.primary {
+                //         font-size: 14px !important;
+                //         margin-left: 12px;
+                //     }
+                // }
 
                 .kray-search-button:hover .kray-search-icon {
                     fill: #fff;
@@ -231,8 +319,8 @@
                 }
 
                 .kray-action-btn svg {
-                    width: 20px;
-                    height: 20px;
+                    width: 25px;
+                    height: 25px;
                 }
 
                 .kray-action-btn:hover {
@@ -254,6 +342,7 @@
 
                 .kray-phone-text {
                     display: none;
+                    margin-left: 6px;
                 }
 
                 .kray-action-btn.primary:hover {
@@ -296,23 +385,7 @@
                     fill: #ffffff;
                     display: block;
                 }
-
-                /* Responsive design */
-
                 
-                /* Full HD screens: 1920px */
-                @media (min-width: 1920px) {
-                    .kray-header-inner {
-                        margin: 0 293px;
-                    }
-                }
-
-                /* 2k/4k screens: larger horizontal margin */
-                @media (min-width: 2560px) {
-                    .kray-header-inner {
-                        margin: 0 612.33px;
-                    }
-                }
 
                 /* Mobile: hide USA flag, align action buttons in one row, search bar below */
                 @media (max-width: 1199px) {
@@ -421,7 +494,7 @@
                         order: 3;
                         width: calc(100% - 40px);
                         max-width: 308px;
-                        margin: 0 20px 12px 20px;
+                        margin: 10px 20px 12px 20px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
@@ -452,11 +525,16 @@
                         border-radius: 0 3px 3px 0;
                     }
                     .kray-search-button {
-                        height: 36px;
-                        min-width: 36px;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 8px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        height: 44px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 0;
+                        right: 0;
                     }
                 }
 
@@ -512,7 +590,7 @@
                     /* Combined row for search and actions */
                     .kray-search-wrapper {
                         order: 2;
-                        width: calc(100% - 550px);
+                        width: calc(100% - 520px);
                         max-width: none;
                         margin: 17px 400px 12px 80px;
                         display: flex;
@@ -545,11 +623,16 @@
                         border-radius: 0 3px 3px 0;
                     }
                     .kray-search-button {
-                        height: 36px;
-                        min-width: 36px;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 8px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        height: 44px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 0;
+                        right: 0;
                     }
                     .kray-actions {
                         order: 2;
@@ -609,7 +692,6 @@
                         width: 90px;
                         height: 65.9px;
                         flex: 0 0 90px;
-                        margin-left: 8px;
                     }
                     .kray-category {
                         order: 1;
@@ -772,16 +854,27 @@
                         border-radius: 0 3px 3px 0;
                     }
                     .kray-search-button {
-                        height: 36px;
-                        min-width: 36px;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 8px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        height: 44px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 0;
+                        right: 0;
                     }
                 }
 
                 /* Medium small screens: 349px - 628px */
                 @media (min-width: 349px) and (max-width: 628px) {
+                    /* Hide the mobile-header div from the live website */
+                    .mobile-header {
+                        display: none !important;
+                        visibility: hidden !important;
+                    }
+                    
                     .kray-header-inner {
                         flex-direction: column;
                         align-items: stretch;
@@ -833,11 +926,11 @@
                         order: 2;
                         flex-direction: row;
                         flex-wrap: nowrap;
-                        justify-content: flex-start;
+                        justify-content: space-between;
                         align-items: center;
-                        gap: 8px;
-                        margin: 12px 20px;
-                        width: calc(100% - 40px);
+                        gap: 6px;
+                        margin: 12px 12px;
+                        width: calc(100% - 24px);
                         min-width: 0;
                         flex: 0 0 auto;
                         max-width: none;
@@ -847,23 +940,34 @@
                         margin-right: 0 !important;
                         min-width: 0;
                         box-sizing: border-box;
-                        padding: 0 8px;
-                        font-size: 12px;
+                        padding: 0 6px;
+                        font-size: 11px;
                         height: 44px;
                         justify-content: center;
                         text-align: center;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
-                    /* Request a Quote - first in visual order - flexible but min 205px */
+                    /* Request a Quote - first in visual order - flexible */
                     .kray-action-btn:nth-child(3) {
                         order: 1;
-                        min-width: 205px;
-                        flex: 1 1 205px;
+                        min-width: 0;
+                        flex: 1 1 auto;
+                        max-width: none;
+                        width: 128px;
+                        font-size: 13px;
+                        margin-left: 5px !important;
+
+
+                    
                     }
-                    /* Call button - second in visual order - flexible but min 148px */
+                    /* Call button - second in visual order - flexible */
                     .kray-action-btn:nth-child(1) {
                         order: 2;
-                        min-width: 148px;
-                        flex: 1 1 148px;
+                        min-width: 0;
+                        flex: 1 1 auto;
+                        max-width: none;
                     }
                     .kray-action-btn:nth-child(1) .kray-phone-text {
                         display: inline;
@@ -873,6 +977,9 @@
                         order: 3;
                         flex: 0 0 44px;
                         width: 44px;
+                        min-width: 44px;
+                        margin-right: 5px !important;
+
                     }
                     /* Hide flag */
                     .kray-actions .kray-flag {
@@ -893,7 +1000,7 @@
                         order: 3;
                         width: 100%;
                         max-width: 100%;
-                        margin: 0;
+                        margin: 10px 2px 0px 1px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
@@ -902,7 +1009,7 @@
                     }
                     .kray-category-select {
                         font-size: 14px !important;
-                        height: 48px !important;
+                        height: 44px !important;
                         min-width: 0 !important;
                         width: auto !important;
                         flex: 0 0 auto !important;
@@ -915,7 +1022,7 @@
                     }
                     .kray-search-input {
                         font-size: 16px !important;
-                        height: 48px !important;
+                        height: 44px !important;
                         padding: 0 48px 0 14px !important;
                         min-width: 0 !important;
                         flex: 1 1 auto !important;
@@ -925,13 +1032,99 @@
                         margin-right: 12px !important;
                     }
                     .kray-search-button {
-                        height: 40px;
+                        background: #80C343;
+                        border: 1.5px solid #003E4A;
+                        border-width: 0px 0px 0px 1.5px;
+                        border-radius: 0px;
+                        height: 41.5px;
+                        width: 44px;
+                        min-width: 44px;
+                        padding: 0;
+                        top: 1px;
+                        bottom: 2px;
+                        right: 13px;
+                    }
+                }
+
+                /* Extra small screens - 349px to 400px */
+                @media (min-width: 349px) and (max-width: 400px) {
+                    .kray-actions {
+                        gap: 4px;
+                        margin: 20px 10px 8px 8px;
+                        width: calc(100% - 16px);
+                    }
+                  
+                    /* Request a Quote - smaller at this size */
+                    .kray-action-btn:nth-child(3) {
+                        flex: 1 1 auto;
+                        max-width: none;
                         min-width: 0;
-                        top: 4px;
-                        right: 4px;
-                        padding: 0 10px;
-                        flex: 0 1 auto;
-                        margin-right: 12px;
+                    }
+                    /* Call button */
+                    .kray-action-btn:nth-child(1) {
+                        flex: 1 1 auto;
+                        max-width: none;
+                        min-width: 0;
+                    }
+                    .kray-action-btn:nth-child(1) .kray-phone-text {
+                        display: inline;
+                        font-size: 12px;
+                    }
+                    /* Profile button */
+                    .kray-action-btn:nth-child(2) {
+                        flex: 0 0 42px;
+                        width: 42px;
+                        min-width: 42px;
+                    }
+                }
+
+                /* Very small screens - below 349px */
+                @media (max-width: 348px) {
+                    .kray-actions {
+                        gap: 3px;
+                        margin: 8px 6px;
+                        width: calc(100% - 12px);
+                    }
+                    .kray-action-btn {
+                        padding: 0 3px;
+                        font-size: 9px;
+                        height: 44px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .kray-action-btn svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+                    /* Request a Quote - must shrink */
+                    .kray-action-btn:nth-child(3) {
+                        flex: 1 1 auto;
+                        max-width: none;
+                        min-width: 0;
+                        margin-left: 12px !important;
+                        font-size: 13px;
+                        width: 127px;
+
+
+                    }
+                    /* Call button */
+                    .kray-action-btn:nth-child(1) {
+                        flex: 1 1 auto;
+                        max-width: none;
+                        min-width: 0;
+                    }
+                    .kray-action-btn:nth-child(1) .kray-phone-text {
+                        display: inline;
+                        font-size: 12px;
+                    }
+                    /* Profile button */
+                    .kray-action-btn:nth-child(2) {
+                        flex: 0 0 40px;
+                        width: 40px;
+                        min-width: 40px;
+                        margin-right: 12px !important;
+
                     }
                 }
             </style>
@@ -983,15 +1176,21 @@
                     <!-- Action Buttons -->
                     <div class="kray-actions">
                         <a href="tel:+18887641698" class="kray-action-btn" aria-label="Call us">
+                            <!--
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
                             </svg>
+                            -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#003E4A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-phone"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" /></svg>
                             <span class="kray-phone-text">(888) 764-1698</span>
                         </a>
                         <a href="/profile" class="kray-action-btn" aria-label="Profile">
+                            <!--
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                             </svg>
+                            -->
+                            <img src="https://www.casterconcepts.com/wp-content/uploads/2024/05/user.svg" alt="Profile" width="25" height="25" style="vertical-align:middle;" />
                         </a>
                         <a href="/quote" class="kray-action-btn primary" aria-label="Request a quote">
                             <span>$</span> Request a Quote
@@ -1012,10 +1211,9 @@
         function performSearch() {
             const query = searchInput.value.trim();
             const category = categorySelect.value;
-            
             if (query) {
-                // Build search URL - customize based on client's search implementation
-                const searchUrl = `/search?q=${encodeURIComponent(query)}&category=${category}`;
+                // Build new search URL format
+                const searchUrl = `/?filter=${encodeURIComponent(category)}&s=${encodeURIComponent(query)}&q=search-results`;
                 window.location.href = searchUrl;
             }
         }
