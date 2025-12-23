@@ -34,61 +34,6 @@ if (document.readyState === 'loading') {
                 secondRow.style.display = "";
                 secondRow.style.visibility = "visible";
             }
-
-            // Hide mobile-header, menu-compare-icon, and headernew elements for all widths below 1200px
-            // Show them for widths 1200px and above
-                // const viewportWidth = window.innerWidth;
-                // const shouldHide = viewportWidth < 1200;
-
-                // const mobileHeaders = document.querySelectorAll(".mobile-header");
-                // const compareIcons = document.querySelectorAll(".menu-compare-icon");
-                // const headerNewElements = document.querySelectorAll(".headernew");
-
-                // if (shouldHide) {
-                //     // Hide elements for screens below 1200px
-                //     mobileHeaders.forEach(header => {
-                //         header.style.display = "none";
-                //         header.style.visibility = "hidden";
-                //         header.style.opacity = "0";
-                //         header.style.pointerEvents = "none";
-                //     });
-
-                //     compareIcons.forEach(icon => {
-                //         icon.style.display = "none";
-                //         icon.style.visibility = "hidden";
-                //         icon.style.opacity = "0";
-                //         icon.style.pointerEvents = "none";
-                //     });
-
-                //     headerNewElements.forEach(element => {
-                //         element.style.display = "none";
-                //         element.style.visibility = "hidden";
-                //         element.style.opacity = "0";
-                //         element.style.pointerEvents = "none";
-                //     });
-                // } else {
-                //     // Show elements for screens 1200px and above
-                //     mobileHeaders.forEach(header => {
-                //         header.style.display = "";
-                //         header.style.visibility = "";
-                //         header.style.opacity = "";
-                //         header.style.pointerEvents = "";
-                //     });
-
-                //     compareIcons.forEach(icon => {
-                //         icon.style.display = "";
-                //         icon.style.visibility = "";
-                //         icon.style.opacity = "";
-                //         icon.style.pointerEvents = "";
-                //     });
-
-                //     headerNewElements.forEach(element => {
-                //         element.style.display = "";
-                //         element.style.visibility = "";
-                //         element.style.opacity = "";
-                //         element.style.pointerEvents = "";
-                //     });
-            // }
         }
 
     /**
@@ -917,8 +862,8 @@ if (document.readyState === 'loading') {
                         width: 48px;
                     }
                     .kray-mobile-menu-btn svg {
-                        width: 24px;
-                        height: 24px;
+                        width: 32px;
+                        height: 32px;
                         fill: #ffffff;
                         display: block;
                     }
@@ -1134,7 +1079,7 @@ if (document.readyState === 'loading') {
                     <!-- Logo -->
                     <div class="client-site-logo">
                         <a href="/" class="client-site-logo-text">
-                            <img src="https://www.casterconcepts.com/wp-content/uploads/2023/06/Caster-Concepts-Web-logo.png" alt="Logo">
+                            <img src="${window.ClientSiteData.logoUrl}" alt="Logo">
                         </a>
                     </div>
 
@@ -1150,13 +1095,7 @@ if (document.readyState === 'loading') {
                         <!-- Category Dropdown -->
                         <div class="kray-category">
                             <select class="kray-category-select" id="kray-category-select" aria-label="Select category">
-                                <option value="all">All</option>
-                                <option value="all-products">All Products</option>
-                                <option value="casters">Casters</option>
-                                <option value="wheels">Wheels</option>
-                                <option value="accessories">Accessories</option>
-                                <option value="replacement-parts">Replacement Parts</option>
-                                <option value="learning-center">Learning Center</option>
+                                ${window.ClientSiteData.categories.map(cat => `<option value="${cat.value}">${cat.label}</option>`).join('')}
                             </select>
                         </div>
                         <input 
@@ -1175,28 +1114,28 @@ if (document.readyState === 'loading') {
 
                     <!-- Action Buttons -->
                     <div class="kray-actions">
-                        <a href="tel:+18887641698" class="kray-action-btn" aria-label="Call us">
+                        <a href="${window.ClientSiteData.actions.call}" class="kray-action-btn" aria-label="Call us">
                             <!--
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
                             </svg>
                             -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#003E4A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-phone"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" /></svg>
-                            <span class="kray-phone-text">(888) 764-1698</span>
+                            <span class="kray-phone-text">${window.ClientSiteData.phoneDisplay}</span>
                         </a>
-                        <a href="/profile" class="kray-action-btn" aria-label="Profile">
+                        <a href="${window.ClientSiteData.actions.profile}" class="kray-action-btn" aria-label="Profile">
                             <!--
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                             </svg>
                             -->
-                            <img src="https://www.casterconcepts.com/wp-content/uploads/2024/05/user.svg" alt="Profile" width="25" height="25" style="vertical-align:middle;" />
+                            <img src="${window.ClientSiteData.profileIcon}" alt="Profile" width="25" height="25" style="vertical-align:middle;" />
                         </a>
-                        <a href="/quote" class="kray-action-btn primary" aria-label="Request a quote">
+                        <a href="${window.ClientSiteData.actions.quote}" class="kray-action-btn primary" aria-label="Request a quote">
                             <span>$</span> Request a Quote
                         </a>
-                        <a href="/" class="kray-flag" aria-label="Made in USA">
-                            <img src="https://www.casterconcepts.com/wp-content/uploads/2025/06/MIA-logo.png" alt="Made in USA">
+                        <a href="${window.ClientSiteData.actions.usa}" class="kray-flag" aria-label="Made in USA">
+                            <img src="${window.ClientSiteData.flagIcon}" alt="Made in USA">
                         </a>
                     </div>
                 </div>
@@ -1211,11 +1150,7 @@ if (document.readyState === 'loading') {
         function performSearch() {
             const query = searchInput.value.trim();
             const category = categorySelect.value;
-            if (query) {
-                // Build new search URL format
-                const searchUrl = `/?filter=${encodeURIComponent(category)}&s=${encodeURIComponent(query)}&q=search-results`;
-                window.location.href = searchUrl;
-            }
+            window.ClientSiteData.redirectToSearch(category, query);
         }
 
         // Search button click
