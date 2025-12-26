@@ -128,28 +128,106 @@ if (document.readyState === 'loading') {
                     margin-left: 0;
                     margin-right: 0;
                     position: relative;
-                    width: 83px;
+                    width: 120px;
                     height: 44px;
+                    z-index: 100;
                 }
 
                 .kray-category-select {
+                    display: none;
+                }
+
+                /* Custom Dropdown */
+                .kray-custom-dropdown {
+                    position: relative;
+                    width: 120px;
                     height: 44px;
-                    width: 83px;
-                    padding: 0 12px;
+                }
+
+                .kray-dropdown-trigger {
+                    height: 44px;
+                    width: 100%;
+                    padding: 0 30px 0 14px;
                     border: 1.5px solid #003E4A;
                     box-shadow: -4px 0 8px -2px #e6f4dd, 0 4px 8px -2px #e6f4dd, 0 -4px 8px -2px #e6f4dd;
                     border-radius: 3px;
                     font-size: 14px;
-                    color: #374151;
+                    font-weight: 500;
+                    color: #003E4A;
                     background: #ffffff;
                     cursor: pointer;
-                    appearance: none;
-                    -webkit-appearance: none;
-                    -moz-appearance: none;
-                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-                    background-repeat: no-repeat;
-                    background-position: right 8px center;
+                    display: block;
+                    line-height: 44px;
+                    position: relative;
                     box-sizing: border-box;
+                    transition: all 0.2s ease;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .kray-dropdown-trigger::after {
+                    content: '';
+                    position: absolute;
+                    right: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 10px;
+                    height: 10px;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23003E4A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+                    background-repeat: no-repeat;
+                    background-size: contain;
+                    transition: transform 0.2s ease;
+                }
+
+                .kray-custom-dropdown.open .kray-dropdown-trigger::after {
+                    transform: translateY(-50%) rotate(180deg);
+                }
+
+                .kray-dropdown-menu {
+                    position: absolute;
+                    top: calc(100% + 2px);
+                    left: 0;
+                    width: 200px;
+                    background: #ffffff;
+                    border: 1px solid #e5e7eb;
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+                    opacity: 0;
+                    visibility: hidden;
+                    transform: translateY(-8px);
+                    transition: all 0.2s ease;
+                    z-index: 1001;
+                    padding: 8px 0;
+                    border-radius: 3px;
+                }
+
+                .kray-custom-dropdown.open .kray-dropdown-menu {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateY(0);
+                }
+
+                .kray-dropdown-item {
+                    padding: 10px 16px;
+                    margin: 2px 8px;
+                    font-size: 14px;
+                    color: #003E4A;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                    white-space: nowrap;
+                    font-weight: normal;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .kray-dropdown-item:hover {
+                    font-weight: bold;
+                    background: #e8f5e0;
+                }
+
+                .kray-dropdown-item.selected {
+                    font-weight: bold;
                 }
 
                 /* Search bar section */
@@ -1094,6 +1172,12 @@ if (document.readyState === 'loading') {
                     <div class="kray-search-wrapper">
                         <!-- Category Dropdown -->
                         <div class="kray-category">
+                            <div class="kray-custom-dropdown" id="kray-custom-dropdown">
+                                <div class="kray-dropdown-trigger" id="kray-dropdown-trigger">All</div>
+                                <div class="kray-dropdown-menu" id="kray-dropdown-menu">
+                                    ${window.ClientSiteData.categories.map((cat, index) => `<div class="kray-dropdown-item${index === 0 ? ' selected' : ''}" data-value="${cat.value}">${cat.label}</div>`).join('')}
+                                </div>
+                            </div>
                             <select class="kray-category-select" id="kray-category-select" aria-label="Select category">
                                 ${window.ClientSiteData.categories.map(cat => `<option value="${cat.value}">${cat.label}</option>`).join('')}
                             </select>
@@ -1147,6 +1231,51 @@ if (document.readyState === 'loading') {
         const searchButton = shadow.getElementById("kray-search-button");
         const categorySelect = shadow.getElementById("kray-category-select");
 
+        // Custom dropdown functionality
+        const customDropdown = shadow.getElementById("kray-custom-dropdown");
+        const dropdownTrigger = shadow.getElementById("kray-dropdown-trigger");
+        const dropdownMenu = shadow.getElementById("kray-dropdown-menu");
+
+        // Toggle dropdown on click
+        dropdownTrigger.addEventListener("click", (e) => {
+            e.stopPropagation();
+            customDropdown.classList.toggle("open");
+        });
+
+        // Handle item selection
+        dropdownMenu.addEventListener("click", (e) => {
+            const item = e.target.closest(".kray-dropdown-item");
+            if (item) {
+                const value = item.dataset.value;
+                const label = item.textContent;
+                
+                // Update trigger text
+                dropdownTrigger.textContent = label;
+                
+                // Update hidden select for form compatibility
+                categorySelect.value = value;
+                
+                // Update selected class
+                shadow.querySelectorAll(".kray-dropdown-item").forEach(i => i.classList.remove("selected"));
+                item.classList.add("selected");
+                
+                // Close dropdown
+                customDropdown.classList.remove("open");
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", () => {
+            customDropdown.classList.remove("open");
+        });
+
+        // Close when clicking elsewhere in shadow DOM
+        shadow.addEventListener("click", (e) => {
+            if (!customDropdown.contains(e.target)) {
+                customDropdown.classList.remove("open");
+            }
+        });
+
         function performSearch() {
             const query = searchInput.value.trim();
             const category = categorySelect.value;
@@ -1162,6 +1291,33 @@ if (document.readyState === 'loading') {
                 performSearch();
             }
         });
+        // Populate search bar and dropdown from URL parameters on page load
+        function populateFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filterParam = urlParams.get('filter');
+            const searchParam = urlParams.get('s');
+            // Set search query if exists
+            if (searchParam) {
+                searchInput.value = searchParam;
+            }
+            // Set filter dropdown if exists
+            if (filterParam) {
+                // Update the hidden select
+                categorySelect.value = filterParam;          
+                // Find the matching dropdown item and update the display
+                const matchingItem = shadow.querySelector(`.kray-dropdown-item[data-value="${filterParam}"]`);
+                if (matchingItem) {
+                    // Update trigger text
+                    dropdownTrigger.textContent = matchingItem.textContent;
+                    
+                    // Update selected class
+                    shadow.querySelectorAll(".kray-dropdown-item").forEach(i => i.classList.remove("selected"));
+                    matchingItem.classList.add("selected");
+                }
+            }
+        }
+        // Call the function to populate from URL on page load
+        populateFromURL();
 
         console.log("Kray Header: Successfully initialized");
     }

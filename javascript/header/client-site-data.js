@@ -18,12 +18,12 @@
         // Search categories
         categories: [
             { value: "all", label: "All" },
-            { value: "all-products", label: "All Products" },
+            { value: "all_products", label: "All Products" },
             { value: "casters", label: "Casters" },
             { value: "wheels", label: "Wheels" },
             { value: "accessories", label: "Accessories" },
-            { value: "replacement-parts", label: "Replacement Parts" },
-            { value: "learning-center", label: "Learning Center" }
+            { value: "replacement_parts", label: "Replacement Parts" },
+            { value: "learning_centers", label: "Learning Center" }
         ],
         
         // Action URLs
@@ -37,7 +37,7 @@
         // URL redirection logic for search
         redirectToSearch: function(category, query) {
             if (!query) return;
-            const searchUrl = `/?filter=${encodeURIComponent(category)}&s=${encodeURIComponent(query)}&q=search-results`;
+            const searchUrl = `/?filter=${encodeURIComponent(category)}&s=${encodeURIComponent(query).replace(/%20/g, '+')}&q=search-results`;
             window.location.href = searchUrl;
         }
     };
