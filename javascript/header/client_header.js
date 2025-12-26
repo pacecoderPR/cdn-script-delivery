@@ -203,10 +203,7 @@ class AutocompleteManager {
      * Fetch suggestions from API
      */
     async fetchSuggestions(query) {
-        if (this.cache[query]) {
-            return this.cache[query];
-        }
-
+        if (this.cache[query]) return this.cache[query];
         try {
             const url = 'https://staging-search.kray.ai/search/autocomplete?namespace=casters&unique=True';
             const response = await fetch(url, {
@@ -222,11 +219,12 @@ class AutocompleteManager {
             });
 
             const data = await response.json();
-            const suggestions = data.map(item => item.suggest.input);
-            this.cache[query] = suggestions;
-            return suggestions;
-        } catch (error) {
-            console.error('Error fetching suggestions:', error);
+            // keep full objects so .suggest.input and .category remain available
+            const items = Array.isArray(data) ? data : (data && Array.isArray(data.response) ? data.response : (data && Array.isArray(data.suggestions) ? data.suggestions : []));
+            this.cache[query] = items;
+            return items;
+        } catch (e) {
+            console.error(e);
             return [];
         }
     }
@@ -318,69 +316,87 @@ class AutocompleteManager {
      * Display suggestions
      */
     showSuggestions(suggestions) {
-        if (!suggestions || suggestions.length === 0) {
+        const dropdown = this.suggestionsList;
+        dropdown.innerHTML = '';
+        if (!Array.isArray(suggestions) || suggestions.length === 0) {
             const li = document.createElement('li');
-            li.textContent = this.searchInput.value || 'No suggestions found';
-            li.style.cssText = 'padding: 10px; color: #999; text-align: center;';
-            this.suggestionsList.innerHTML = '';
-            this.suggestionsList.appendChild(li);
-        } else {
-            const currentQuery = this.searchInput.value.trim().toLowerCase();
-            const fragment = document.createDocumentFragment();
-
-            suggestions.forEach(suggestion => {
-                const li = document.createElement('li');
-                li.style.cssText = `
-                    padding: 10px 12px;
-                    cursor: pointer;
-                    transition: background-color 0.2s;
-                    border-bottom: 1px solid #f0f0f0;
-                `;
-
-                // Check if suggestion has category info (like product.html)
-                let suggestionText = suggestion;
-                let categoryName = null;
-                
-                if (typeof suggestion === 'object' && suggestion.suggest) {
-                    suggestionText = suggestion.suggest.input;
-                    categoryName = suggestion.category;
-                }
-
-                const suggestionLower = suggestionText.toLowerCase();
-                const matchIndex = suggestionLower.indexOf(currentQuery);
-
-                let innerHTML = '';
-                
-                if (matchIndex !== -1 && currentQuery.length > 0) {
-                    const beforeMatch = suggestionText.substring(0, matchIndex);
-                    const matchedPart = suggestionText.substring(matchIndex, matchIndex + currentQuery.length);
-                    const afterMatch = suggestionText.substring(matchIndex + currentQuery.length);
-                    
-                    // Matched text in black bold only - no gaps
-                    innerHTML = beforeMatch +
-                        '<span style="font-weight: bold; color: #000000;">' + matchedPart + '</span>' +
-                        afterMatch;
-                } else {
-                    innerHTML = suggestionText;
-                }
-
-                // Add category suffix like in product.html (in casters)
-                if (categoryName && categoryName !== "products") {
-                    innerHTML += ' <span style="font-weight: bold; color: #7FC143; font-style: italic;">in ' + categoryName.replace(/_/g, ' ') + '</span>';
-                }
-
-                li.innerHTML = innerHTML;
-                li.addEventListener('mouseover', () => li.style.backgroundColor = '#f0f0f0');
-                li.addEventListener('mouseout', () => li.style.backgroundColor = 'transparent');
-
-                fragment.appendChild(li);
-            });
-
-            this.suggestionsList.innerHTML = '';
-            this.suggestionsList.appendChild(fragment);
+            li.textContent = this.searchInput.value || 'No suggestions';
+            dropdown.appendChild(li);
+            this.suggestionsBox.style.display = 'block';
+            return;
         }
 
+        const currentQuery = this.searchInput.value.trim().toLowerCase();
+        // Group by category
+        const grouped = {};
+        suggestions.forEach(item => {
+            const cat = (item?.category || '').replace(/_/g, ' ').trim();
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push(item);
+        });
+
+        Object.entries(grouped).forEach(([cat, items]) => {
+            if (items.length > 1 && cat && cat !== 'products') {
+                // category header like "In <cat>"
+                const hdr = document.createElement('div');
+                hdr.className = 'suggestion-category-header';
+                hdr.innerHTML = 'In <span>' + cat + '</span>';
+                dropdown.appendChild(hdr);
+                items.forEach(it => {
+                    const text = it?.suggest?.input || '';
+                    const opt = this._createSuggestionItem(text, currentQuery, cat, true);
+                    opt.classList.add('grouped-item');
+                    dropdown.appendChild(opt);
+                });
+            } else {
+                items.forEach(it => {
+                    const text = it?.suggest?.input || '';
+                    const opt = this._createSuggestionItem(text, currentQuery, cat, false);
+                    // append suffix for single item (if not products)
+                    if (cat && cat !== 'products') {
+                        const span = document.createElement('span');
+                        span.className = 'suggestion-category';
+                        span.textContent = ' in ' + cat;
+                        // ensure styling matches testplugin (green, italic)
+                        span.style.cssText = 'font-weight:700; color:#7FC143; font-style:italic; margin-left:6px;';
+                        opt.appendChild(span);
+                    }
+                    dropdown.appendChild(opt);
+                });
+            }
+        });
+
         this.suggestionsBox.style.display = 'block';
+    }
+
+    /**
+     * Create suggestion item for dropdown
+     */
+    _createSuggestionItem(text, currentQuery, category, grouped) {
+        const option = document.createElement('li');
+        option.className = 'kray-suggestion-item';
+        const lower = text.toLowerCase();
+        const idx = lower.indexOf(currentQuery);
+        if (idx !== -1 && currentQuery.length > 0) {
+            const before = text.substring(0, idx);
+            const match = text.substring(idx, idx + currentQuery.length);
+            const after = text.substring(idx + currentQuery.length);
+            option.innerHTML = before + '<span class="typed-text">' + match + '</span>' + '<span class="suggested-text">' + after + '</span>';
+        } else {
+            option.textContent = text;
+        }
+        // store category for click behavior
+        if (category) option.dataset.category = category.replace(/\s+/g, '_');
+        option.addEventListener('click', () => {
+            this.searchInput.value = text;
+            if (option.dataset.category) this.categorySelect.value = option.dataset.category;
+            this.suggestionsBox.style.display = 'none';
+            this.performSearch(text);
+        });
+        option.addEventListener('mouseover', () => {
+            this.searchInput.value = text;
+        });
+        return option;
     }
 
     /**
@@ -696,6 +712,16 @@ if (document.readyState === 'loading') {
                     border-bottom: none !important;
                 }
 
+                /* Align grouped suggestions with regular items (remove extra left gap) */
+                .kray-suggestions-box .grouped-item {
+                    padding-left: 24px !important; /* indent under category header */
+                }
+                /* Ensure category header lines up with list items */
+                .kray-suggestions-box .suggestion-category-header {
+                    padding-left: 12px !important;
+                    box-sizing: border-box;
+                }
+                
                 /* Action buttons section */
                 .kray-actions {
                     flex-shrink: 0;
@@ -703,6 +729,26 @@ if (document.readyState === 'loading') {
                     align-items: center;
                     gap: 12px;
                 }
+
+                .suggestion-category-header {
+                  padding: 8px 12px;
+                  color: #7FC143;
+                   font-style: italic;
+                 font-weight: 700;
+                   font-size: 13px;
+              }
+                .suggestion-category-header span {
+                   color: inherit;
+                  font-weight: inherit;
+                  font-style: inherit;
+               }
+              .kray-suggestions-box .suggestion-category {
+                  font-weight: 700;
+                  color: #7FC143;
+                  font-style: italic;
+                 margin-left: 6px;
+                  font-size: 13px;
+            }
 
                 .kray-action-btn {
                     width: 44px;
