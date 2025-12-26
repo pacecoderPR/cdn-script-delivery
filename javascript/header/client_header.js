@@ -64,21 +64,12 @@ if (document.readyState === 'loading') {
                     box-sizing: border-box;
                 }
 
-                /* Hide mobile-header from the live website globally */
+                /* mobile-header is visible by default */
                 .mobile-header {
-                    display: none !important;
-                    visibility: hidden !important;
-                    opacity: 0 !important;
-                    pointer-events: none !important;
-                }
-
-                @media (min-width: 1200px) {
-                    .mobile-header {
-                        display: block !important;
-                        visibility: visible !important;
-                        opacity: 1 !important;
-                        pointer-events: auto !important;
-                    }
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    pointer-events: auto !important;
                 }
 
                 /* Main header container */
@@ -88,7 +79,7 @@ if (document.readyState === 'loading') {
                     background: #ffffff;
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                     position: fixed;
-                    z-index: 9999;
+                    z-index: 98;
                 }
 
                 /* Inner wrapper for content */
@@ -158,7 +149,7 @@ if (document.readyState === 'loading') {
                     cursor: pointer;
                     display: block;
                     line-height: 44px;
-                    position: relative;
+                    positiorn: relative;
                     box-sizing: border-box;
                     transition: all 0.2s ease;
                     overflow: hidden;
@@ -422,28 +413,10 @@ if (document.readyState === 'loading') {
                         max-width: 100%;
                     }
                     .client-site-logo {
-                        order: 1;
-                        justify-content: flex-start;
-                        margin-bottom: 12px;
-                        width: 100%;
-                        min-width: 0;
-                        flex: 1 1 0;
-                        max-width: none;
-                        position: relative;
-                        padding: 12px 20px;
-                        background: #003E4A;
-                        height: auto;
-                    }
-                    .client-site-logo img {
-                        content: url('https://www.casterconcepts.com/wp-content/uploads/2023/01/cci-logo-inverted.png');
-                        background: transparent;
-                        padding: 0;
-                        border-radius: 0;
-                        height: 48px;
-                        width: auto;
+                        display: none !important;
                     }
                     .kray-mobile-menu-btn {
-                        display: block !important;
+                        display: none !important;
                         position: absolute;
                         top: 12px;
                         right: 20px;
@@ -582,17 +555,16 @@ if (document.readyState === 'loading') {
                         max-width: none;
                         position: relative;
                         padding: 12px 80px;
-                        background: #003E4A;
+                        background: transparent;
                     }
                     .client-site-logo img {
-                        content: url('https://www.casterconcepts.com/wp-content/uploads/2023/01/cci-logo-inverted.png');
                         background: transparent;
                         padding: 0;
                         border-radius: 0;
                         height: 48px;
                     }
                     .kray-mobile-menu-btn {
-                        display: block !important;
+                        display: none !important;
                         position: absolute;
                         top: 12px;
                         right: 80px;
@@ -615,7 +587,7 @@ if (document.readyState === 'loading') {
                         order: 2;
                         width: calc(100% - 520px);
                         max-width: none;
-                        margin: 17px 400px 12px 80px;
+                        margin: 95px 400px 12px 80px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
@@ -729,6 +701,9 @@ if (document.readyState === 'loading') {
 
                 /* Medium screens: 629px - 990px */
                 @media (min-width: 629px) and (max-width: 990px) {
+                    .kray-header {
+                        margin-top: 60px;
+                    }
                     .kray-header-inner {
                         flex-direction: column;
                         align-items: stretch;
@@ -739,26 +714,10 @@ if (document.readyState === 'loading') {
                         max-width: 100%;
                     }
                     .client-site-logo {
-                        order: 1;
-                        justify-content: flex-start;
-                        margin-bottom: 0;
-                        width: 100%;
-                        min-width: 0;
-                        flex: 1 1 0;
-                        max-width: none;
-                        position: relative;
-                        padding: 12px 80px;
-                        background: #003E4A;
-                    }
-                    .client-site-logo img {
-                        content: url('https://www.casterconcepts.com/wp-content/uploads/2023/01/cci-logo-inverted.png');
-                        background: transparent;
-                        padding: 0;
-                        border-radius: 0;
-                        height: 48px;
+                        display: none !important;
                     }
                     .kray-mobile-menu-btn {
-                        display: block !important;
+                        display: none !important;
                         position: absolute;
                         top: 12px;
                         right: 80px;
@@ -892,13 +851,10 @@ if (document.readyState === 'loading') {
 
                 /* Medium small screens: 349px - 628px */
                 @media (min-width: 349px) and (max-width: 628px) {
-                    /* Hide the mobile-header div from the live website */
-                    .mobile-header {
-                        display: none !important;
-                        visibility: hidden !important;
+                .kray-header {
+                        margin-top: 60px;
                     }
-                    
-                    .kray-header-inner {
+                .kray-header-inner {
                         flex-direction: column;
                         align-items: stretch;
                         gap: 0;
@@ -908,26 +864,10 @@ if (document.readyState === 'loading') {
                         max-width: 100%;
                     }
                     .client-site-logo {
-                        order: 1;
-                        justify-content: flex-start;
-                        margin-bottom: 0;
-                        width: 100%;
-                        min-width: 0;
-                        flex: 1 1 0;
-                        max-width: none;
-                        position: relative;
-                        padding: 12px 20px;
-                        background: #003E4A;
-                    }
-                    .client-site-logo img {
-                        content: url('https://www.casterconcepts.com/wp-content/uploads/2023/01/cci-logo-inverted.png');
-                        background: transparent;
-                        padding: 0;
-                        border-radius: 0;
-                        height: 48px;
+                        display: none !important;
                     }
                     .kray-mobile-menu-btn {
-                        display: block !important;
+                        display: none !important;
                         position: absolute;
                         top: 12px;
                         right: 20px;
@@ -942,7 +882,7 @@ if (document.readyState === 'loading') {
                     .kray-mobile-menu-btn svg {
                         width: 32px;
                         height: 32px;
-                        fill: #ffffff;
+                        fill: #003E4A;
                         display: block;
                     }
                     .kray-actions {
@@ -1103,6 +1043,9 @@ if (document.readyState === 'loading') {
 
                 /* Very small screens - below 349px */
                 @media (max-width: 348px) {
+                    .kray-header {
+                        margin-top: 60px;
+                    }
                     .kray-actions {
                         gap: 3px;
                         margin: 8px 6px;
