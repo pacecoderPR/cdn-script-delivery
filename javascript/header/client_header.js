@@ -80,6 +80,39 @@ class AutocompleteManager {
         
         // Suggestion item click
         this.suggestionsList.addEventListener('click', (e) => this.handleSuggestionClick(e));
+        
+        // Suggestion mouseover and mouseleave for hover behavior
+        this.suggestionsBox.addEventListener('mouseover', (e) => this.handleSuggestionHover(e));
+        this.suggestionsBox.addEventListener('mouseleave', () => this.handleSuggestionLeave());
+    }
+
+
+
+      //Store original query when suggestions open
+    storeOriginalQuery() {
+        if (!this.originalQuery) {
+            this.originalQuery = this.searchInput.value;
+        }
+    }
+
+    /**
+     * Handle suggestion hover (mouseover)
+     */
+    handleSuggestionHover(e) {
+        const li = e.target.closest('li');
+        if (li && li.textContent) {
+            this.storeOriginalQuery();
+            this.searchInput.value = li.textContent.trim();
+        }
+    }
+
+    /**
+     * Handle suggestion leave (mouseleave) - restore original query
+     */
+    handleSuggestionLeave() {
+        if (this.originalQuery !== undefined) {
+            this.searchInput.value = this.originalQuery;
+        }
     }
 
     /**
@@ -87,7 +120,7 @@ class AutocompleteManager {
      */
     async handleInputFocus(e) {
         this.currentIndex = -1;
-        
+        this.storeOriginalQuery()
         if (this.searchInput.value.length === 0) {
             let defaultSuggestions = await this.fetchDefaultSuggestions();
             // Ensure it's always an array
@@ -106,9 +139,14 @@ class AutocompleteManager {
     handleInputChange(e) {
         const query = this.searchInput.value.trim();
         
+        // Reset original query when user starts typing fresh
+        this.originalQuery = query;
+        
         if (query.length >= 3) {
             this.debounceFetchSuggestions(query);
         } else if (query.length === 0) {
+            // Clear original query when input is fully emptied
+            this.originalQuery = '';
             this.suggestionsBox.style.display = 'none';
         }
     }
@@ -375,15 +413,19 @@ class AutocompleteManager {
     _createSuggestionItem(text, currentQuery, category, grouped) {
         const option = document.createElement('li');
         option.className = 'kray-suggestion-item';
-        const lower = text.toLowerCase();
+        // minimal XSS-safe escaping
+        const escapeHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        const lower = (text || '').toLowerCase();
         const idx = lower.indexOf(currentQuery);
         if (idx !== -1 && currentQuery.length > 0) {
-            const before = text.substring(0, idx);
-            const match = text.substring(idx, idx + currentQuery.length);
-            const after = text.substring(idx + currentQuery.length);
+            const before = escapeHtml(text.substring(0, idx));
+            const match = escapeHtml(text.substring(idx, idx + currentQuery.length));
+            const after = escapeHtml(text.substring(idx + currentQuery.length));
+            // typed part (what user typed) stays normal weight; suggested remainder is bold
             option.innerHTML = before + '<span class="typed-text">' + match + '</span>' + '<span class="suggested-text">' + after + '</span>';
         } else {
-            option.textContent = text;
+            // show full suggestion as suggested-text (bold) when no typed match present
+            option.innerHTML = '<span class="suggested-text">' + escapeHtml(text) + '</span>';
         }
         // store category for click behavior
         if (category) option.dataset.category = category.replace(/\s+/g, '_');
@@ -712,6 +754,16 @@ if (document.readyState === 'loading') {
                     border-bottom: none !important;
                 }
 
+                /* Highlighting: typed (user) text = normal; suggested text = bold (match testplugin.php) */
+                .kray-suggestions-box .typed-text {
+                    font-weight: 400 !important;
+                    color: #133E46 !important;
+                }
+                .kray-suggestions-box .suggested-text {
+                    font-weight: 700 !important;
+                    color: #133E46 !important;
+                }
+                
                 /* Align grouped suggestions with regular items (remove extra left gap) */
                 .kray-suggestions-box .grouped-item {
                     padding-left: 24px !important; /* indent under category header */
