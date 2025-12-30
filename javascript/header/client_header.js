@@ -912,9 +912,9 @@ if (document.readyState === 'loading') {
                       position: relative;
                    }
                    .kray-suggestions-box {
-                       width: calc(100% - 83px) !important; /* search input width (exclude 83px category dropdown) */
-                      left: 83px !important; /* align with search input start */
-                      right: auto !important;
+                        width: calc(100% - 120px) !important;
+                        left: 120px !important;
+                        right: auto !important;
                    }
                 }
 
@@ -1307,9 +1307,9 @@ if (document.readyState === 'loading') {
                       position: relative;
                    }
                    .kray-suggestions-box {
-                       width: calc(100% - 90px) !important; /* search input width (exclude 83px category dropdown) */
-                      left: 90px !important; /* align with search input start */
-                      right: auto !important;
+                        width: calc(100% - 119px) !important;
+                        left: 119px !important;
+                        right: auto !important;
                    }
                 }
 
@@ -1466,9 +1466,9 @@ if (document.readyState === 'loading') {
                       position: relative;
                    }
                    .kray-suggestions-box {
-                       width: calc(100% - 90px) !important; /* search input width (exclude 83px category dropdown) */
-                      left: 90px !important; /* align with search input start */
-                      right: auto !important;
+                        width: calc(100% - 119px) !important;
+                        left: 119px !important;
+                        right: auto !important;
                     }
                 }
 
