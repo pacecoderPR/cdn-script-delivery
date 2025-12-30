@@ -1,3 +1,522 @@
+/**
+ * AutocompleteManager - Handles all autocomplete functionality for the header search
+ */
+class AutocompleteManager {
+    constructor(searchInput, searchButton, categorySelect, shadowRoot) {
+        this.searchInput = searchInput;
+        this.searchButton = searchButton;
+        this.categorySelect = categorySelect;
+        this.shadowRoot = shadowRoot;
+        this.cache = {};
+        this.debounceTimeout = null;
+        this.currentIndex = -1;
+        this.originalQuery = '';
+        this.currentSearchQuery = '';
+        
+        this.init();
+    }
+
+    /**
+     * Initialize autocomplete functionality
+     */
+    init() {
+        // create suggestions container first so suggestionsList exists
+        this.createSuggestionsContainer();
+        this.setupEventListeners();
+    }
+
+    /**
+     * Create suggestions container in shadow DOM
+     */
+    createSuggestionsContainer() {
+        const suggestionsBox = document.createElement('div');
+        suggestionsBox.className = 'kray-suggestions-box';
+        suggestionsBox.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 4px;
+        `;
+        suggestionsBox.innerHTML = `
+            <ul class="kray-suggestions-list" style="list-style: none; margin: 0; padding: 0;"></ul>
+        `;
+        
+        this.searchInput.parentElement.style.position = 'relative';
+        this.searchInput.parentElement.appendChild(suggestionsBox);
+        this.suggestionsBox = suggestionsBox;
+        this.suggestionsList = suggestionsBox.querySelector('.kray-suggestions-list');
+    }
+
+    /**
+     * Setup all event listeners for autocomplete
+     */
+    setupEventListeners() {
+        // Input focus event
+        this.searchInput.addEventListener('focus', (e) => this.handleInputFocus(e));
+        
+        // Input event for typing
+        this.searchInput.addEventListener('input', (e) => this.handleInputChange(e));
+        
+        // Keyboard navigation
+        this.searchInput.addEventListener('keydown', (e) => this.handleKeyboard(e));
+        
+        // Click outside to close suggestions
+        document.addEventListener('click', (e) => this.handleClickOutside(e));
+        
+        // Search button click
+        this.searchButton.addEventListener('click', () => this.performSearch());
+        
+        // Suggestion item click
+        this.suggestionsList.addEventListener('click', (e) => this.handleSuggestionClick(e));
+        
+        // Suggestion mouseover and mouseleave for hover behavior
+        this.suggestionsBox.addEventListener('mouseover', (e) => this.handleSuggestionHover(e));
+        this.suggestionsBox.addEventListener('mouseleave', () => this.handleSuggestionLeave());
+
+        // Clear (cross) button
+        this.clearBtn = (this.shadowRoot && this.shadowRoot.querySelector) ? this.shadowRoot.querySelector('#kray-clear-btn') : null;
+        if (this.clearBtn) {
+            this.toggleClearButton();
+            this.searchInput.addEventListener('input', () => this.toggleClearButton());
+            this.clearBtn.addEventListener('click', () => {
+                this.searchInput.value = '';
+                this.originalQuery = '';
+                this.suggestionsBox.style.display = 'none';
+                this.toggleClearButton();
+                this.searchInput.focus();
+            });
+        }
+    }
+
+
+
+      //Store original query when suggestions open
+    storeOriginalQuery() {
+        if (!this.originalQuery) {
+            this.originalQuery = this.searchInput.value;
+        }
+    }
+
+    /**
+     * Handle suggestion hover (mouseover)
+     */
+    handleSuggestionHover(e) {
+        const li = e.target.closest('li');
+        if (li && li.textContent) {
+            this.storeOriginalQuery();
+            this.searchInput.value = li.textContent.trim();
+        }
+    }
+
+    /**
+     * Handle suggestion leave (mouseleave) - restore original query
+     */
+    handleSuggestionLeave() {
+        if (this.originalQuery !== undefined) {
+            this.searchInput.value = this.originalQuery;
+        }
+    }
+
+    /**
+     * Handle input focus
+     */
+    async handleInputFocus(e) {
+        this.currentIndex = -1;
+        this.storeOriginalQuery()
+        if (this.searchInput.value.length === 0) {
+            let defaultSuggestions = await this.fetchDefaultSuggestions();
+            // Ensure it's always an array
+            if (!Array.isArray(defaultSuggestions)) {
+                defaultSuggestions = [];
+            }
+            this.showSuggestions(defaultSuggestions);
+        } else if (this.searchInput.value.length >= 3) {
+            this.debounceFetchSuggestions(this.searchInput.value);
+        }
+    }
+
+    /**
+     * Handle input change
+     */
+    handleInputChange(e) {
+        const query = this.searchInput.value.trim();
+        
+        // Reset original query when user starts typing fresh
+        this.originalQuery = query;
+        
+        if (query.length >= 3) {
+            this.debounceFetchSuggestions(query);
+        } else if (query.length === 0) {
+            // Clear original query when input is fully emptied
+            this.originalQuery = '';
+            this.suggestionsBox.style.display = 'none';
+        }
+    }
+
+    /**
+     * Handle keyboard navigation
+     */
+    handleKeyboard(e) {
+        const items = this.suggestionsList.querySelectorAll('li');
+        const total = items.length;
+
+        if (!total) return;
+
+        // Store original query on first arrow key
+        if (this.currentIndex === -1 && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+            this.originalQuery = this.searchInput.value;
+        }
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            this.currentIndex = this.currentIndex === total - 1 ? -1 : this.currentIndex + 1;
+            this.updateHoverState(items);
+            return;
+        }
+
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            this.currentIndex = this.currentIndex === -1 ? total - 1 : this.currentIndex - 1;
+            this.updateHoverState(items);
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            let query = '';
+            if (this.currentIndex >= 0 && this.currentIndex < items.length) {
+                query = items[this.currentIndex].dataset.value || items[this.currentIndex].textContent.trim();
+            } else {
+                query = this.searchInput.value.trim();
+            }
+            if (!query) return;
+            // update input before navigating
+            this.searchInput.value = query;
+            this.toggleClearButton && this.toggleClearButton();
+            this.originalQuery = query;
+            this.suggestionsBox.style.display = 'none';
+            if (query) this.performSearch(query);
+        }
+    }
+
+    /**
+     * Update hover state for keyboard navigation
+     */
+    updateHoverState(items) {
+        items.forEach(li => li.classList.remove("hover"));
+
+        if (this.currentIndex === -1) {
+            this.searchInput.value = this.originalQuery;
+            return;
+        }
+
+        if (this.currentIndex < 0 || this.currentIndex >= items.length) return;
+
+        const li = items[this.currentIndex];
+        li.classList.add("hover");
+        this.searchInput.value = li.dataset && li.dataset.value ? li.dataset.value : li.textContent.trim();
+        li.scrollIntoView({ block: "nearest" });
+    }
+
+    /**
+     * Handle click outside suggestions
+     */
+    handleClickOutside(e) {
+        // support Shadow DOM events
+        const path = (e.composedPath && e.composedPath()) || e.path || [];
+        const clickedInside = path.includes(this.searchInput) || path.includes(this.suggestionsBox) ||
+                              this.searchInput === e.target || this.suggestionsBox === e.target;
+        if (!clickedInside && this.suggestionsBox) {
+            this.suggestionsBox.style.display = 'none';
+        }
+    }
+
+    /**
+     * Handle suggestion item click
+     */
+    handleSuggestionClick(e) {
+        const li = e.target.closest('li');
+        if (!li) return;
+
+        const selectedQuery = li.dataset && li.dataset.value ? li.dataset.value : li.textContent.trim();
+        // set input and UI first, then navigate
+        this.searchInput.value = selectedQuery;
+        this.toggleClearButton && this.toggleClearButton();
+        this.originalQuery = selectedQuery;
+        this.suggestionsBox.style.display = 'none';
+        this.performSearch(selectedQuery);
+
+        // // Train the autocomplete
+        // this.trainAutocomplete(selectedQuery);
+    }
+
+    /**
+     * Fetch suggestions from API
+     */
+    async fetchSuggestions(query) {
+        if (this.cache[query]) return this.cache[query];
+        try {
+            const url = 'https://staging-search.kray.ai/search/autocomplete?namespace=casters&unique=True';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    "prefix": query,
+                    "group": "all"
+                })
+            });
+
+            const data = await response.json();
+            // keep full objects so .suggest.input and .category remain available
+            const items = Array.isArray(data) ? data : (data && Array.isArray(data.response) ? data.response : (data && Array.isArray(data.suggestions) ? data.suggestions : []));
+            this.cache[query] = items;
+            return items;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    /**
+     * Fetch default suggestions when input is empty
+     */
+    async fetchDefaultSuggestions() {
+        try {
+            const response = await fetch('https://staging-search.kray.ai/search/suggestions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    "namespace": "casters",
+                    "group": "all"
+                })
+            });
+
+            const data = await response.json();
+            // Ensure we return an array
+            if (Array.isArray(data)) {
+                return data;
+            } else if (data && typeof data === 'object') {
+                // If response is an object with suggestions inside, extract it
+                return data.suggestions || data.results || [];
+            }
+            return [];
+        } catch (error) {
+            console.error('Error fetching default suggestions:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Fetch prefix/scope suggestions
+     */
+    async fetchPrefixes(group = "all") {
+        try {
+            const trainer_baseUrl = "https://staging-search.kray.ai";
+            const storeName = "casters";
+            const url = `${trainer_baseUrl}/autocomplete/prefixes/${storeName}/${group}`;
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data || !Array.isArray(data.prefixes)) {
+                throw new Error("Invalid response format: Missing 'prefixes' array.");
+            }
+
+            let rawList = [...new Set(data.prefixes)].slice(0, 5);
+            
+            const uniquePrefixes = rawList.map(text => {
+                let modifiedText = text.replace(/(\d)"\s*|(\d)"$/g, '$1$2 inch ');
+                return modifiedText.trim();
+            });
+
+            return uniquePrefixes.filter(p => p.length > 0);
+        } catch (error) {
+            console.error(`Error fetching prefixes:`, error);
+            return [];
+        }
+    }
+
+    /**
+     * Debounce function for fetching suggestions
+     */
+    debounceFetchSuggestions(query) {
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = setTimeout(async () => {
+            const suggestions = await this.fetchSuggestions(query);
+            this.showSuggestions(suggestions);
+        }, 300);
+    }
+
+    /**
+     * Display suggestions
+     */
+    showSuggestions(suggestions) {
+        const dropdown = this.suggestionsList;
+        dropdown.innerHTML = '';
+        if (!Array.isArray(suggestions) || suggestions.length === 0) {
+            this.suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        const currentQuery = this.searchInput.value.trim().toLowerCase();
+        // Group by category
+        const grouped = {};
+        suggestions.forEach(item => {
+            const cat = (item?.category || '').replace(/_/g, ' ').trim();
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push(item);
+        });
+
+        Object.entries(grouped).forEach(([cat, items]) => {
+            if (items.length > 1 && cat && cat !== 'products') {
+                // category header like "In <cat>"
+                const hdr = document.createElement('div');
+                hdr.className = 'suggestion-category-header';
+                hdr.innerHTML = 'In <span>' + cat + '</span>';
+                dropdown.appendChild(hdr);
+                items.forEach(it => {
+                    const text = it?.suggest?.input || '';
+                    const opt = this._createSuggestionItem(text, currentQuery, cat, true);
+                    opt.classList.add('grouped-item');
+                    dropdown.appendChild(opt);
+                });
+            } else {
+                items.forEach(it => {
+                    const text = it?.suggest?.input || '';
+                    const opt = this._createSuggestionItem(text, currentQuery, cat, false);
+                    // append suffix for single item (if not products)
+                    if (cat && cat !== 'products') {
+                        const span = document.createElement('span');
+                        span.className = 'suggestion-category';
+                        span.textContent = ' in ' + cat;
+                        // ensure styling matches testplugin (green, italic)
+                        span.style.cssText = 'font-weight:700; color:#7FC143; font-style:italic; margin-left:6px;';
+                        opt.appendChild(span);
+                    }
+                    dropdown.appendChild(opt);
+                });
+            }
+        });
+
+        this.suggestionsBox.style.display = 'block';
+    }
+
+    /**
+     * Create suggestion item for dropdown
+     */
+    _createSuggestionItem(text, currentQuery, category, grouped) {
+        const option = document.createElement('li');
+        option.className = 'kray-suggestion-item';
+        // store raw suggestion value (used by click/hover/keyboard handlers)
+        option.dataset.value = String(text || '');
+        // minimal XSS-safe escaping
+        const escapeHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        const lower = (text || '').toLowerCase();
+        const idx = lower.indexOf(currentQuery);
+        if (idx !== -1 && currentQuery.length > 0) {
+            const before = escapeHtml(text.substring(0, idx));
+            const match = escapeHtml(text.substring(idx, idx + currentQuery.length));
+            const after = escapeHtml(text.substring(idx + currentQuery.length));
+            // typed part (what user typed) stays normal weight; suggested remainder is bold
+            option.innerHTML = before + '<span class="typed-text">' + match + '</span>' + '<span class="suggested-text">' + after + '</span>';
+        } else {
+            // show full suggestion as suggested-text (bold) when no typed match present
+            option.innerHTML = '<span class="suggested-text">' + escapeHtml(text) + '</span>';
+        }
+        // store category for click behavior
+        if (category) option.dataset.category = category.replace(/\s+/g, '_');
+        // mouse interactions update input preview but rely on delegated click handler for selection
+        option.addEventListener('mouseover', () => {
+            this.storeOriginalQuery();
+            this.searchInput.value = option.dataset.value || text;
+        });
+        return option;
+    }
+
+    /**
+     * Perform search
+     */
+    performSearch(query = null) {
+        const searchQuery = query || this.searchInput.value.trim();
+        const category = this.categorySelect.value;
+
+        if (!searchQuery) return;
+
+        this.currentSearchQuery = searchQuery;
+        
+        // Call the redirect function from window.ClientSiteData
+        if (window.ClientSiteData && window.ClientSiteData.redirectToSearch) {
+            window.ClientSiteData.redirectToSearch(category, searchQuery);
+        }
+
+        // Train the autocomplete
+        this.trainAutocomplete(searchQuery);
+    }
+
+    // /**
+    //  * Train autocomplete with search query
+    //  */
+    // trainAutocomplete(query) {
+    //     fetch("https://staging-search.kray.ai/train/autocomplete/search-query", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({
+    //             store_name: "casters",
+    //             prefix: query,
+    //             domain: window.location.hostname
+    //         })
+    //     })
+    //     .then(response => response.json())
+    //     .then(result => {
+    //         if (result.status === "failed") {
+    //             console.error("Query training failed:", result.message);
+    //         }
+    //     })
+    //     .catch(error => console.error("Autocomplete training error:", error));
+    // }
+
+    // /**
+    //  * Clear cache
+    //  */
+    clearCache() {
+        this.cache = {};
+    }
+
+    /**
+     * Show/hide clear button based on input content
+     */
+    toggleClearButton() {
+        if (!this.clearBtn) return;
+        const hasText = (this.searchInput.value || '').length > 0;
+        this.clearBtn.style.display = hasText ? 'flex' : 'none';
+    }
+}
+
 // Inject custom CSS for live site header#header padding
 function injectHeaderPaddingCSS() {
     const style = document.createElement('style');
@@ -273,6 +792,23 @@ if (document.readyState === 'loading') {
                     flex-shrink: 0;
                 }
 
+                /* Clear (x) button inside search input */
+                .kray-clear-btn {
+                    position: absolute;
+                    top: 6px;
+                    right: 52px; /* left of search button */
+                    width: 32px;
+                    height: 32px;
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    z-index: 4;
+                }
+                .kray-clear-btn svg { opacity: 0.9; }
+                
                 .kray-search-icon {
                     width: 20px;
                     height: 20px;
@@ -285,31 +821,101 @@ if (document.readyState === 'loading') {
                 .kray-action-btn.primary {
                     font-size: 28px;
                 }
-                // @media (max-width: 1280px) {
-                //     .kray-search-icon {
-                //         width: 20px !important;
-                //         height: 20px !important;
-                //     }
-                //     .kray-action-btn svg {
-                //         width: 20px !important;
-                //         height: 20px !important;
-                //     }
-                //     .kray-action-btn.primary {
-                //         font-size: 14px !important;
-                //         margin-left: 12px;
-                //     }
-                // }
+
 
                 .kray-search-button:hover .kray-search-icon {
                     fill: #fff;
                 }
 
+                /* Autocomplete suggestions styling */
+                .kray-suggestions-box {
+                    background: #ffffff !important;
+                    border: 1px solid #ddd !important;
+                    border-radius: 3px !important;
+                    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1) !important;
+                }
+
+                .kray-suggestions-box li {
+                    padding: 10px 12px !important;
+                    cursor: pointer !important;
+                    border-bottom: 1px solid #f0f0f0 !important;
+                    font-size: 13px !important;
+                    color: #374151 !important;
+                    transition: background-color 0.2s !important;
+                }
+
+                .kray-suggestions-box li:hover,
+                .kray-suggestions-box li.hover {
+                    background-color: #f0f0f0 !important;
+                }
+
+                .kray-suggestions-box li:last-child {
+                    border-bottom: none !important;
+                }
+
+                /* Highlighting: typed (user) text = normal; suggested text = bold (match testplugin.php) */
+                .kray-suggestions-box .typed-text {
+                    font-weight: 400 !important;
+                    color: #133E46 !important;
+                }
+                .kray-suggestions-box .suggested-text {
+                    font-weight: 700 !important;
+                    color: #133E46 !important;
+                }
+                
+                /* Align grouped suggestions with regular items (remove extra left gap) */
+                .kray-suggestions-box .grouped-item {
+                    padding-left: 24px !important; /* indent under category header */
+                }
+                /* Ensure category header lines up with list items */
+                .kray-suggestions-box .suggestion-category-header {
+                    padding-left: 12px !important;
+                    box-sizing: border-box;
+                }
+                
                 /* Action buttons section */
                 .kray-actions {
                     flex-shrink: 0;
                     display: flex;
                     align-items: center;
                     gap: 12px;
+                }
+
+                .suggestion-category-header {
+                  padding: 8px 12px;
+                  color: #7FC143;
+                   font-style: italic;
+                 font-weight: 700;
+                   font-size: 13px;
+              }
+                .suggestion-category-header span {
+                   color: inherit;
+                  font-weight: inherit;
+                  font-style: inherit;
+               }
+              .kray-suggestions-box .suggestion-category {
+                  font-weight: 700;
+                  color: #7FC143;
+                  font-style: italic;
+                 margin-left: 6px;
+                  font-size: 13px;
+            }
+
+                @media (min-width: 1200px) {
+                    .mobile-header {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        pointer-events: auto !important;
+                    }
+                    .kray-search-wrapper {
+                      position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: calc(100% - 83px) !important; /* search input width (exclude 83px category dropdown) */
+                      left: 83px !important; /* align with search input start */
+                      right: auto !important;
+                   }
                 }
 
                 .kray-action-btn {
@@ -697,6 +1303,14 @@ if (document.readyState === 'loading') {
                         flex: 0 0 auto;
                         max-width: none;
                     }
+                    .kray-search-wrapper {
+                      position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: calc(100% - 90px) !important; /* search input width (exclude 83px category dropdown) */
+                      left: 90px !important; /* align with search input start */
+                      right: auto !important;
+                   }
                 }
 
                 /* Medium screens: 629px - 990px */
@@ -846,6 +1460,15 @@ if (document.readyState === 'loading') {
                         padding: 0;
                         top: 0;
                         right: 0;
+                   }
+
+                    .kray-search-wrapper {
+                      position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: calc(100% - 90px) !important; /* search input width (exclude 83px category dropdown) */
+                      left: 90px !important; /* align with search input start */
+                      right: auto !important;
                     }
                 }
 
@@ -961,83 +1584,59 @@ if (document.readyState === 'loading') {
                     }
                     .kray-search-wrapper {
                         order: 3;
-                        width: 100%;
+                        width: calc(100% - 24px);
                         max-width: 100%;
-                        margin: 10px 2px 0px 1px;
+                        margin: 0px 0px 10px 6px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
                         min-width: 0;
-                        flex: 1 1 auto;
+                        flex: 0 0 auto;
                     }
                     .kray-category-select {
                         font-size: 14px !important;
-                        height: 44px !important;
-                        min-width: 0 !important;
+                       height: 44px !important;
+                        min-width: 70px !important;
                         width: auto !important;
                         flex: 0 0 auto !important;
-                        max-width: 80px !important;
+                        max-width: 90px !important;
                         margin-right: 0 !important;
                         margin-left: 0 !important;
                         border-radius: 3px 0 0 3px;
                         box-sizing: border-box;
-                        padding: 0 12px 0 12px !important;
+                        padding: 0 24px 0 12px !important;
                     }
                     .kray-search-input {
-                        font-size: 16px !important;
+                        font-size: 14px !important;
                         height: 44px !important;
-                        padding: 0 48px 0 14px !important;
+                        padding: 0 44px 0 12px !important;
                         min-width: 0 !important;
                         flex: 1 1 auto !important;
                         width: 100% !important;
                         max-width: none !important;
                         border-radius: 0 3px 3px 0;
-                        margin-right: 12px !important;
                     }
                     .kray-search-button {
                         background: #80C343;
                         border: 1.5px solid #003E4A;
-                        border-width: 0px 0px 0px 1.5px;
-                        border-radius: 0px;
-                        height: 41.5px;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        height: 44px;
                         width: 44px;
                         min-width: 44px;
                         padding: 0;
-                        top: 1px;
-                        bottom: 2px;
-                        right: 13px;
+                        top: 0;
+                        right: 0;
                     }
-                }
 
-                /* Extra small screens - 349px to 400px */
-                @media (min-width: 349px) and (max-width: 400px) {
-                    .kray-actions {
-                        gap: 4px;
-                        margin: 20px 10px 8px 8px;
-                        width: calc(100% - 16px);
-                    }
-                  
-                    /* Request a Quote - smaller at this size */
-                    .kray-action-btn:nth-child(3) {
-                        flex: 1 1 auto;
-                        max-width: none;
-                        min-width: 0;
-                    }
-                    /* Call button */
-                    .kray-action-btn:nth-child(1) {
-                        flex: 1 1 auto;
-                        max-width: none;
-                        min-width: 0;
-                    }
-                    .kray-action-btn:nth-child(1) .kray-phone-text {
-                        display: inline;
-                        font-size: 12px;
-                    }
-                    /* Profile button */
-                    .kray-action-btn:nth-child(2) {
-                        flex: 0 0 42px;
-                        width: 42px;
-                        min-width: 42px;
+                    /* Suggestions box spans full search wrapper width at small screens */
+                   .kray-search-wrapper {
+                       position: relative;
+                   }
+                   .kray-suggestions-box {
+                    width: calc(100% - 10px) !important;
+                    left: 10px !important;
+                    right: 0 !important;
                     }
                 }
 
@@ -1092,6 +1691,15 @@ if (document.readyState === 'loading') {
                         margin-right: 12px !important;
 
                     }
+
+                    .kray-search-wrapper {
+                       position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: 100% !important;
+                       left: 0 !important;
+                       right: 0 !important;
+                   }
                 }
             </style>
 
@@ -1132,6 +1740,10 @@ if (document.readyState === 'loading') {
                             placeholder="Try 'noise reducing casters'"
                             aria-label="Search"
                         >
+                        <!-- clear button (hidden/shown via JS) -->
+                        <button id="kray-clear-btn" class="kray-clear-btn" aria-label="Clear search">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                         <button class="kray-search-button" id="kray-search-button" aria-label="Search">
                             <svg class="kray-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -1219,50 +1831,14 @@ if (document.readyState === 'loading') {
             }
         });
 
-        function performSearch() {
-            const query = searchInput.value.trim();
-            const category = categorySelect.value;
-            window.ClientSiteData.redirectToSearch(category, query);
-        }
+        const autocompleteManager = new AutocompleteManager(
+            searchInput,
+            searchButton,
+            categorySelect,
+            shadow
+        );
 
-        // Search button click
-        searchButton.addEventListener("click", performSearch);
-
-        // Enter key in search input
-        searchInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                performSearch();
-            }
-        });
-        // Populate search bar and dropdown from URL parameters on page load
-        function populateFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const filterParam = urlParams.get('filter');
-            const searchParam = urlParams.get('s');
-            // Set search query if exists
-            if (searchParam) {
-                searchInput.value = searchParam;
-            }
-            // Set filter dropdown if exists
-            if (filterParam) {
-                // Update the hidden select
-                categorySelect.value = filterParam;          
-                // Find the matching dropdown item and update the display
-                const matchingItem = shadow.querySelector(`.kray-dropdown-item[data-value="${filterParam}"]`);
-                if (matchingItem) {
-                    // Update trigger text
-                    dropdownTrigger.textContent = matchingItem.textContent;
-                    
-                    // Update selected class
-                    shadow.querySelectorAll(".kray-dropdown-item").forEach(i => i.classList.remove("selected"));
-                    matchingItem.classList.add("selected");
-                }
-            }
-        }
-        // Call the function to populate from URL on page load
-        populateFromURL();
-
-        console.log("Kray Header: Successfully initialized");
+        console.log("Kray Header: Successfully initialized with autocomplete");
     }
 
     /**
