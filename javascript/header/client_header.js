@@ -379,10 +379,7 @@ class AutocompleteManager {
         const dropdown = this.suggestionsList;
         dropdown.innerHTML = '';
         if (!Array.isArray(suggestions) || suggestions.length === 0) {
-            const li = document.createElement('li');
-            li.textContent = this.searchInput.value || 'No suggestions';
-            dropdown.appendChild(li);
-            this.suggestionsBox.style.display = 'block';
+            this.suggestionsBox.style.display = 'none';
             return;
         }
 
