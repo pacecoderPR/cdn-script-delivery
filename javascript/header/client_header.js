@@ -81,6 +81,20 @@ class AutocompleteManager {
         // Suggestion mouseover and mouseleave for hover behavior
         this.suggestionsBox.addEventListener('mouseover', (e) => this.handleSuggestionHover(e));
         this.suggestionsBox.addEventListener('mouseleave', () => this.handleSuggestionLeave());
+
+        // Clear (cross) button
+        this.clearBtn = (this.shadowRoot && this.shadowRoot.querySelector) ? this.shadowRoot.querySelector('#kray-clear-btn') : null;
+        if (this.clearBtn) {
+            this.toggleClearButton();
+            this.searchInput.addEventListener('input', () => this.toggleClearButton());
+            this.clearBtn.addEventListener('click', () => {
+                this.searchInput.value = '';
+                this.originalQuery = '';
+                this.suggestionsBox.style.display = 'none';
+                this.toggleClearButton();
+                this.searchInput.focus();
+            });
+        }
     }
 
 
@@ -178,11 +192,19 @@ class AutocompleteManager {
 
         if (e.key === 'Enter') {
             e.preventDefault();
-            this.suggestionsBox.style.display = 'none';
-            const query = this.searchInput.value.trim();
-            if (query) {
-                this.performSearch(query);
+            let query = '';
+            if (this.currentIndex >= 0 && this.currentIndex < items.length) {
+                query = items[this.currentIndex].dataset.value || items[this.currentIndex].textContent.trim();
+            } else {
+                query = this.searchInput.value.trim();
             }
+            if (!query) return;
+            // update input before navigating
+            this.searchInput.value = query;
+            this.toggleClearButton && this.toggleClearButton();
+            this.originalQuery = query;
+            this.suggestionsBox.style.display = 'none';
+            if (query) this.performSearch(query);
         }
     }
 
@@ -201,7 +223,7 @@ class AutocompleteManager {
 
         const li = items[this.currentIndex];
         li.classList.add("hover");
-        this.searchInput.value = li.textContent.trim();
+        this.searchInput.value = li.dataset && li.dataset.value ? li.dataset.value : li.textContent.trim();
         li.scrollIntoView({ block: "nearest" });
     }
 
@@ -225,13 +247,16 @@ class AutocompleteManager {
         const li = e.target.closest('li');
         if (!li) return;
 
-        const selectedQuery = li.textContent.trim();
+        const selectedQuery = li.dataset && li.dataset.value ? li.dataset.value : li.textContent.trim();
+        // set input and UI first, then navigate
         this.searchInput.value = selectedQuery;
+        this.toggleClearButton && this.toggleClearButton();
+        this.originalQuery = selectedQuery;
         this.suggestionsBox.style.display = 'none';
         this.performSearch(selectedQuery);
 
-        // Train the autocomplete
-        this.trainAutocomplete(selectedQuery);
+        // // Train the autocomplete
+        // this.trainAutocomplete(selectedQuery);
     }
 
     /**
@@ -410,6 +435,8 @@ class AutocompleteManager {
     _createSuggestionItem(text, currentQuery, category, grouped) {
         const option = document.createElement('li');
         option.className = 'kray-suggestion-item';
+        // store raw suggestion value (used by click/hover/keyboard handlers)
+        option.dataset.value = String(text || '');
         // minimal XSS-safe escaping
         const escapeHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
         const lower = (text || '').toLowerCase();
@@ -426,14 +453,10 @@ class AutocompleteManager {
         }
         // store category for click behavior
         if (category) option.dataset.category = category.replace(/\s+/g, '_');
-        option.addEventListener('click', () => {
-            this.searchInput.value = text;
-            if (option.dataset.category) this.categorySelect.value = option.dataset.category;
-            this.suggestionsBox.style.display = 'none';
-            this.performSearch(text);
-        });
+        // mouse interactions update input preview but rely on delegated click handler for selection
         option.addEventListener('mouseover', () => {
-            this.searchInput.value = text;
+            this.storeOriginalQuery();
+            this.searchInput.value = option.dataset.value || text;
         });
         return option;
     }
@@ -485,6 +508,15 @@ class AutocompleteManager {
     //  */
     clearCache() {
         this.cache = {};
+    }
+
+    /**
+     * Show/hide clear button based on input content
+     */
+    toggleClearButton() {
+        if (!this.clearBtn) return;
+        const hasText = (this.searchInput.value || '').length > 0;
+        this.clearBtn.style.display = hasText ? 'flex' : 'none';
     }
 }
 
@@ -687,6 +719,23 @@ if (document.readyState === 'loading') {
                     flex-shrink: 0;
                 }
 
+                /* Clear (x) button inside search input */
+                .kray-clear-btn {
+                    position: absolute;
+                    top: 6px;
+                    right: 52px; /* left of search button */
+                    width: 32px;
+                    height: 32px;
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    z-index: 4;
+                }
+                .kray-clear-btn svg { opacity: 0.9; }
+                
                 .kray-search-icon {
                     width: 20px;
                     height: 20px;
@@ -699,20 +748,7 @@ if (document.readyState === 'loading') {
                 .kray-action-btn.primary {
                     font-size: 28px;
                 }
-                // @media (max-width: 1280px) {
-                //     .kray-search-icon {
-                //         width: 20px !important;
-                //         height: 20px !important;
-                //     }
-                //     .kray-action-btn svg {
-                //         width: 20px !important;
-                //         height: 20px !important;
-                //     }
-                //     .kray-action-btn.primary {
-                //         font-size: 14px !important;
-                //         margin-left: 12px;
-                //     }
-                // }
+
 
                 .kray-search-button:hover .kray-search-icon {
                     fill: #fff;
@@ -1537,7 +1573,7 @@ if (document.readyState === 'loading') {
                     }
                     .kray-category-select {
                         font-size: 14px !important;
-                        height: 44px !important;
+                       height: 44px !important;
                         min-width: 70px !important;
                         width: auto !important;
                         flex: 0 0 auto !important;
@@ -1673,6 +1709,10 @@ if (document.readyState === 'loading') {
                             placeholder="Try 'noise reducing casters'"
                             aria-label="Search"
                         >
+                        <!-- clear button (hidden/shown via JS) -->
+                        <button id="kray-clear-btn" class="kray-clear-btn" aria-label="Clear search">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                         <button class="kray-search-button" id="kray-search-button" aria-label="Search">
                             <svg class="kray-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
