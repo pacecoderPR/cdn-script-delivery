@@ -47,9 +47,6 @@ class AutocompleteManager {
             margin-top: 4px;
         `;
         suggestionsBox.innerHTML = `
-            <div style="padding: 10px; background-color: #f5f5f5; border-bottom: 1px solid #ddd; font-weight: bold; font-size: 12px; color: #333;">
-                Suggestions
-            </div>
             <ul class="kray-suggestions-list" style="list-style: none; margin: 0; padding: 0;"></ul>
         `;
         
@@ -565,14 +562,7 @@ if (document.readyState === 'loading') {
                     pointer-events: none !important;
                 }
 
-                @media (min-width: 1200px) {
-                    .mobile-header {
-                        display: block !important;
-                        visibility: visible !important;
-                        opacity: 1 !important;
-                        pointer-events: auto !important;
-                    }
-                }
+
 
                 /* Main header container */
 
@@ -801,6 +791,23 @@ if (document.readyState === 'loading') {
                  margin-left: 6px;
                   font-size: 13px;
             }
+
+                @media (min-width: 1200px) {
+                    .mobile-header {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        pointer-events: auto !important;
+                    }
+                    .kray-search-wrapper {
+                      position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: calc(100% - 83px) !important; /* search input width (exclude 83px category dropdown) */
+                      left: 83px !important; /* align with search input start */
+                      right: auto !important;
+                   }
+                }
 
                 .kray-action-btn {
                     width: 44px;
@@ -1206,6 +1213,14 @@ if (document.readyState === 'loading') {
                         flex: 0 0 auto;
                         max-width: none;
                     }
+                    .kray-search-wrapper {
+                      position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: calc(100% - 90px) !important; /* search input width (exclude 83px category dropdown) */
+                      left: 90px !important; /* align with search input start */
+                      right: auto !important;
+                   }
                 }
 
                 /* Medium screens: 629px - 990px */
@@ -1368,6 +1383,15 @@ if (document.readyState === 'loading') {
                         padding: 0;
                         top: 0;
                         right: 0;
+                   }
+
+                    .kray-search-wrapper {
+                      position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: calc(100% - 90px) !important; /* search input width (exclude 83px category dropdown) */
+                      left: 90px !important; /* align with search input start */
+                      right: auto !important;
                     }
                 }
 
@@ -1502,9 +1526,9 @@ if (document.readyState === 'loading') {
                     }
                     .kray-search-wrapper {
                         order: 3;
-                        width: 100%;
+                        width: calc(100% - 24px);
                         max-width: 100%;
-                        margin: 10px 2px 12px 1px;
+                        margin: 0px 0px 10px 6px;
                         display: flex;
                         flex-direction: row;
                         gap: 0;
@@ -1546,37 +1570,15 @@ if (document.readyState === 'loading') {
                         top: 0;
                         right: 0;
                     }
-                }
 
-                /* Extra small screens - 349px to 400px */
-                @media (min-width: 349px) and (max-width: 400px) {
-                    .kray-actions {
-                        gap: 4px;
-                        margin: 20px 10px 8px 8px;
-                        width: calc(100% - 16px);
-                    }
-                  
-                    /* Request a Quote - smaller at this size */
-                    .kray-action-btn:nth-child(3) {
-                        flex: 1 1 auto;
-                        max-width: none;
-                        min-width: 0;
-                    }
-                    /* Call button */
-                    .kray-action-btn:nth-child(1) {
-                        flex: 1 1 auto;
-                        max-width: none;
-                        min-width: 0;
-                    }
-                    .kray-action-btn:nth-child(1) .kray-phone-text {
-                        display: inline;
-                        font-size: 12px;
-                    }
-                    /* Profile button */
-                    .kray-action-btn:nth-child(2) {
-                        flex: 0 0 42px;
-                        width: 42px;
-                        min-width: 42px;
+                    /* Suggestions box spans full search wrapper width at small screens */
+                   .kray-search-wrapper {
+                       position: relative;
+                   }
+                   .kray-suggestions-box {
+                    width: calc(100% - 10px) !important;
+                    left: 10px !important;
+                    right: 0 !important;
                     }
                 }
 
@@ -1628,6 +1630,15 @@ if (document.readyState === 'loading') {
                         margin-right: 12px !important;
 
                     }
+
+                    .kray-search-wrapper {
+                       position: relative;
+                   }
+                   .kray-suggestions-box {
+                       width: 100% !important;
+                       left: 0 !important;
+                       right: 0 !important;
+                   }
                 }
             </style>
 
